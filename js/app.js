@@ -10,7 +10,8 @@ var MEU_ENDERECO = null;
 var VALOR_CARRINHO = 0;
 var VALOR_ENTREGA = 7.5;
 
-var CELULAR_EMPRESA = '5517991234567';
+var CELULAR_EMPRESA = '82999627481';
+var CELULAR_EMPRESA_WA = `55${CELULAR_EMPRESA}`;
 
 cardapio.eventos = {
 
@@ -505,7 +506,7 @@ cardapio.metodos = {
 
                     // converte a URL
                     let encode = encodeURI(texto);
-                    let URL = `https://wa.me/${CELULAR_EMPRESA}?text=${encode}`;
+                    let URL = `https://wa.me/${CELULAR_EMPRESA_WA}?text=${encode}`;
 
                     $("#btnEtapaResumo").attr('href', URL);
 
@@ -523,7 +524,7 @@ cardapio.metodos = {
         var texto = 'Olá! gostaria de fazer uma *reserva*';
 
         let encode = encodeURI(texto);
-        let URL = `https://wa.me/${CELULAR_EMPRESA}?text=${encode}`;
+        let URL = `https://wa.me/${CELULAR_EMPRESA_WA}?text=${encode}`;
 
         $("#btnReserva").attr('href', URL);
 
@@ -533,6 +534,59 @@ cardapio.metodos = {
     carregarBotaoLigar: () => {
 
         $("#btnLigar").attr('href', `tel:${CELULAR_EMPRESA}`);
+
+    },
+
+    // abre/fecha o mini menu do WhatsApp flutuante
+    alternarMiniWhatsapp: () => {
+        $("#whatsappMiniMenu").toggleClass('hidden');
+
+        if (!$("#whatsappMiniMenu").hasClass('hidden')) {
+            $("#txtWppNome").focus();
+        }
+    },
+
+    // fecha o mini menu do WhatsApp
+    fecharMiniWhatsapp: () => {
+        $("#whatsappMiniMenu").addClass('hidden');
+    },
+
+    // valida e envia os dados para o WhatsApp
+    enviarMiniWhatsapp: () => {
+
+        let nome = $("#txtWppNome").val().trim();
+        let email = $("#txtWppEmail").val().trim();
+        let numero = $("#txtWppNumero").val().trim();
+        let numeroLimpo = numero.replace(/\D/g, '');
+
+        if (nome.length < 2) {
+            cardapio.metodos.mensagem('Informe seu nome.');
+            $("#txtWppNome").focus();
+            return;
+        }
+
+        if (email.length <= 0 || email.indexOf('@') < 0) {
+            cardapio.metodos.mensagem('Informe um e-mail válido.');
+            $("#txtWppEmail").focus();
+            return;
+        }
+
+        if (numeroLimpo.length < 10) {
+            cardapio.metodos.mensagem('Informe um WhatsApp válido.');
+            $("#txtWppNumero").focus();
+            return;
+        }
+
+        var texto = 'Olá! Quero atendimento.';
+        texto += `\n*Nome:* ${nome}`;
+        texto += `\n*E-mail:* ${email}`;
+        texto += `\n*WhatsApp:* ${numero}`;
+
+        let encode = encodeURI(texto);
+        let URL = `https://wa.me/${CELULAR_EMPRESA_WA}?text=${encode}`;
+
+        window.open(URL, '_blank');
+        cardapio.metodos.fecharMiniWhatsapp();
 
     },
 

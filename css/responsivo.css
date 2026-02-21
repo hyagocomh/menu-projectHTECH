@@ -160,6 +160,16 @@
         justify-content: center;
     }
 
+    .whatsapp-widget {
+        right: 20px;
+        bottom: 120px;
+    }
+
+    .whatsapp-mini-menu {
+        width: calc(100vw - 40px);
+        max-width: 340px;
+    }
+
     .modal-full {
         padding: 40px;
     }

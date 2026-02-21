@@ -26,6 +26,39 @@
             <i class="fa fa-shopping-bag"></i>
         </a>
 
+        <div class="whatsapp-widget" id="whatsappWidget">
+            <a class="whatsapp-trigger" onclick="cardapio.metodos.alternarMiniWhatsapp()">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+
+            <div class="whatsapp-mini-menu hidden" id="whatsappMiniMenu">
+                <div class="whatsapp-mini-header">
+                    <div>
+                        <p class="whatsapp-mini-title"><b>Atendimento</b></p>
+                        <p class="whatsapp-mini-status">Online agora</p>
+                    </div>
+                    <a class="whatsapp-mini-close" onclick="cardapio.metodos.fecharMiniWhatsapp()">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+
+                <div class="whatsapp-mini-body">
+                    <p class="whatsapp-mini-text">
+                        Oi! Para agilizar seu atendimento, preencha os dados abaixo.
+                    </p>
+
+                    <div class="whatsapp-mini-form">
+                        <input id="txtWppNome" type="text" class="form-control form-control-mini" placeholder="Seu nome" />
+                        <input id="txtWppEmail" type="email" class="form-control form-control-mini" placeholder="Seu e-mail" />
+                        <input id="txtWppNumero" type="text" class="form-control form-control-mini" placeholder="WhatsApp" />
+                        <a class="btn btn-whatsapp-enviar" onclick="cardapio.metodos.enviarMiniWhatsapp()">
+                            Ir para WhatsApp <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <section class="header">
             <div class="container">
                 <nav class="navbar navbar-expand-lg pl-0 pr-0 col-one">
@@ -80,7 +113,7 @@
                                     <span class="icon-left">
                                         <i class="fa fa-phone"></i>
                                     </span>
-                                    (82) 99407-2451
+                                    (82) 99962-7481
                                 </a>
                             </div>
                         </div>
