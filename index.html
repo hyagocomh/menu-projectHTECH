@@ -433,22 +433,25 @@
         </footer>
 
 
-        <div class="modal-full animated fadeIn hidden" id="modalCarrinho">
+        <div class="modal-full animated fadeIn hidden" id="modalCarrinho" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lblTituloEtapa">
 
             <div class="m-header">
                 <div class="container">
                     <img class="logo-modal" src="./img/logo-maknas.png" alt="Makna's Burguer" />
-                    <a class="btn btn-white btn-sm float-right" onclick="cardapio.metodos.abrirCarrinho(false)">
-                        Fechar
-                    </a>
+                    <button type="button" class="btn btn-white btn-sm float-right btn-fechar-carrinho" aria-label="Fechar carrinho" onclick="cardapio.metodos.abrirCarrinho(false)">
+                        Fechar <i class="fas fa-times"></i>
+                    </button>
                     <div class="etapas">
                         <div class="etapa etapa1 active">1</div>
                         <div class="etapa etapa2">2</div>
                         <div class="etapa etapa3">3</div>
                     </div>
-                    <p class="title-carrinho mt-4">
-                        <b id="lblTituloEtapa">Seu carrinho:</b>
-                    </p>
+                    <div class="cart-title-row mt-4">
+                        <p class="title-carrinho mb-0"><b id="lblTituloEtapa">Seu carrinho:</b></p>
+                        <button type="button" id="btnLimparCarrinho" class="btn-limpar-carrinho hidden" onclick="cardapio.metodos.limparCarrinho()">
+                            <i class="fas fa-trash"></i> Limpar carrinho
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -464,10 +467,10 @@
                         <div class="col-12 col-lg-4 col-md-4 col-sm-12">
                             <div class="form-group container-cep">
                                 <label>CEP:</label>
-                                <input id="txtCEP" type="text" class="form-control" />
-                                <a class="btn btn-yellow btn-sm" onclick="cardapio.metodos.buscarCep()">
+                                <input id="txtCEP" type="text" class="form-control" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" />
+                                <button type="button" id="btnBuscarCep" class="btn btn-yellow btn-sm" aria-label="Buscar CEP" onclick="cardapio.metodos.buscarCep()">
                                     <i class="fa fa-search"></i>
-                                </a>
+                                </button>
                             </div>
                         </div>
 
@@ -476,35 +479,35 @@
                         <div class="col-12 col-lg-6 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>Endereço:</label>
-                                <input id="txtEndereco" type="text" class="form-control" />
+                                <input id="txtEndereco" type="text" class="form-control" autocomplete="street-address" />
                             </div>
                         </div>
 
                         <div class="col-12 col-lg-4 col-md-4 col-sm-12">
                             <div class="form-group">
                                 <label>Bairro:</label>
-                                <input id="txtBairro" type="text" class="form-control" />
+                                <input id="txtBairro" type="text" class="form-control" autocomplete="address-level3" />
                             </div>
                         </div>
 
                         <div class="col-12 col-lg-2 col-md-2 col-sm-12">
                             <div class="form-group">
                                 <label>Número:</label>
-                                <input id="txtNumero" type="text" class="form-control" />
+                                <input id="txtNumero" type="text" class="form-control" inputmode="numeric" autocomplete="off" />
                             </div>
                         </div>
 
                         <div class="col-12 col-lg-6 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>Cidade:</label>
-                                <input id="txtCidade" type="text" class="form-control" />
+                                <input id="txtCidade" type="text" class="form-control" autocomplete="address-level2" />
                             </div>
                         </div>
 
                         <div class="col-12 col-lg-4 col-md-4 col-sm-12">
                             <div class="form-group">
                                 <label>Complemento:</label>
-                                <input id="txtComplemento" type="text" class="form-control" />
+                                <input id="txtComplemento" type="text" class="form-control" autocomplete="off" />
                             </div>
                         </div>
 
@@ -605,8 +608,8 @@
                     <a onclick="cardapio.metodos.resumoPedido()" class="btn btn-yellow float-right hidden" id="btnEtapaEndereco">
                         Revisar pedido
                     </a>
-                    <a href="#" class="btn btn-yellow float-right hidden" id="btnEtapaResumo" target="_blank">
-                        Enviar pedido
+                    <a href="#" class="btn btn-yellow float-right hidden" id="btnEtapaResumo" target="_blank" rel="noopener noreferrer">
+                        Enviar no WhatsApp <i class="fab fa-whatsapp"></i>
                     </a>
 
                     <a onclick="cardapio.metodos.voltarEtapa()" class="btn btn-white float-right mr-3 hidden" id="btnVoltar">

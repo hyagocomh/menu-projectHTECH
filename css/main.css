@@ -45,6 +45,10 @@ body {
     color: var(--color-text);
 }
 
+body.carrinho-aberto {
+    overflow: hidden;
+}
+
 body::selection {
     background: var(--color-primary);
     color: var(--color-white);
@@ -183,6 +187,13 @@ a.navbar-brand {
 .btn:hover,
 .btn:focus {
     transform: translateY(-2px);
+}
+
+.btn.disabled,
+.btn[aria-disabled='true'] {
+    pointer-events: none;
+    opacity: 0.42;
+    transform: none;
 }
 
 .btn-white {
@@ -746,6 +757,7 @@ a.navbar-brand {
     justify-content: center;
     padding: 4px 8px;
     border: 1px solid rgba(255, 250, 240, 0.30);
+    background: transparent;
     color: var(--color-white);
     font-size: 11px;
     cursor: pointer;
@@ -1114,6 +1126,34 @@ footer {
     font-size: 22px;
 }
 
+.cart-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.btn-limpar-carrinho {
+    padding: 6px 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-out);
+    font-family: 'PoppinsRegular', Arial, sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 160ms ease;
+}
+
+.btn-limpar-carrinho:hover,
+.btn-limpar-carrinho:focus {
+    color: var(--color-primary);
+    outline: none;
+}
+
+.btn-limpar-carrinho i {
+    margin-right: 5px;
+}
+
 .modal-full .item-carrinho {
     display: flex;
     align-items: center;
@@ -1146,6 +1186,22 @@ footer {
     margin-bottom: 0;
     color: var(--color-primary);
     font-size: 20px;
+}
+
+.modal-full .cart-price-detail {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.modal-full .cart-price-detail span {
+    color: var(--color-text-out);
+    font-size: 11px;
+}
+
+.modal-full .cart-price-detail b {
+    color: var(--color-primary);
+    font-size: 18px;
 }
 
 .modal-full .dados-produto {
@@ -1238,6 +1294,11 @@ select.form-control {
     right: 20px;
 }
 
+.container-cep .btn.loading {
+    pointer-events: none;
+    opacity: 0.72;
+}
+
 .img-produto-resumo img {
     width: 54px;
     height: 48px;
@@ -1259,9 +1320,17 @@ select.form-control {
 }
 
 .price-produto-resumo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
     margin-bottom: 0;
     color: var(--color-primary);
     font-size: 14px;
+}
+
+.price-produto-resumo span {
+    color: var(--color-text-out);
+    font-size: 11px;
 }
 
 .quantidade-produto-resumo {
