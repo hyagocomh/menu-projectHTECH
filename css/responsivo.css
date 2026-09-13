@@ -350,14 +350,27 @@
 
     .card-item .add-carrinho {
         right: 12px;
-        bottom: 12px;
+        bottom: 10px;
     }
 
     .btn-menos,
     .btn-mais,
-    .add-numero-itens,
-    .btn-add {
+    .add-numero-itens {
         height: 27px;
+    }
+
+    .card-item .btn-add,
+    .card-item .controle-quantidade-card,
+    .card-item .controle-quantidade-card .btn-menos,
+    .card-item .controle-quantidade-card .btn-mais,
+    .card-item .controle-quantidade-card .add-numero-itens {
+        height: 31px;
+    }
+
+    .card-item .btn-add {
+        padding-right: 10px;
+        padding-left: 10px;
+        font-size: 9px;
     }
 
     .add-numero-itens {

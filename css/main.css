@@ -737,9 +737,9 @@ a.navbar-brand {
 .card-item .add-carrinho {
     position: absolute;
     right: 14px;
-    bottom: 19px;
+    bottom: 15px;
     display: flex;
-    height: 31px;
+    height: 38px;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -793,16 +793,54 @@ a.navbar-brand {
 
 .btn-add {
     display: inline-flex;
-    height: 31px;
+    height: 38px;
     align-items: center;
     justify-content: center;
-    margin-left: 8px;
-    padding: 4px 9px;
+    margin-left: 0;
+    padding: 0 15px;
     border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: var(--color-primary);
     color: var(--color-white);
-    font-size: 12px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.btn-add i {
+    margin-right: 7px;
+}
+
+.btn-add:hover,
+.btn-add:focus {
+    border-color: #ff4146;
+    background: #ff1d23;
+    box-shadow: 0 9px 22px rgba(242, 13, 19, 0.28);
+    color: var(--color-white);
+}
+
+.controle-quantidade-card {
+    display: flex;
+    height: 38px;
+    align-items: center;
+    border-radius: 5px;
+    box-shadow: 0 0 0 1px rgba(242, 13, 19, 0.38);
+}
+
+.card-item .controle-quantidade-card .btn-menos,
+.card-item .controle-quantidade-card .btn-mais,
+.card-item .controle-quantidade-card .add-numero-itens {
+    height: 38px;
+}
+
+.card-item .controle-quantidade-card .btn-menos,
+.card-item .controle-quantidade-card .btn-mais {
+    border-color: transparent;
+}
+
+.card-item .controle-quantidade-card .add-numero-itens {
+    min-width: 36px;
+    border-color: rgba(242, 13, 19, 0.38);
 }
 
 .depoimentos {

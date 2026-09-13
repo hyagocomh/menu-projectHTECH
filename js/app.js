@@ -149,7 +149,9 @@ cardapio.metodos = {
         $(".container-menu a").removeClass('active');
 
         // seta o menu para ativo
-        $("#menu-" + categoria).addClass('active')
+        $("#menu-" + categoria).addClass('active');
+
+        cardapio.metodos.sincronizarControlesCardapio();
 
     },
 
@@ -163,76 +165,79 @@ cardapio.metodos = {
 
     },
 
-    // diminuir a quantidade do item no cardapio
-    diminuirQuantidade: (id) => {
+    // localiza o produto em qualquer categoria do catálogo
+    obterProdutoPorId: (id) => {
+        let produto = null;
 
-        let qntdAtual = parseInt($("#qntd-" + id).text()) || 0;
-
-        if (qntdAtual > 0) {
-            $("#qntd-" + id).text(qntdAtual - 1)
-        }
-
-    },
-
-    // aumentar a quantidade do item no cardapio
-    aumentarQuantidade: (id) => {
-
-        let qntdAtual = parseInt($("#qntd-" + id).text()) || 0;
-        $("#qntd-" + id).text(Math.min(qntdAtual + 1, LIMITE_ITEM_CARRINHO));
-
-    },
-
-    // adicionar ao carrinho o item do cardápio
-    adicionarAoCarrinho: (id) => {
-
-        let qntdAtual = parseInt($("#qntd-" + id).text());
-
-        // Um clique direto na sacola adiciona uma unidade.
-        if (!qntdAtual || qntdAtual < 1) {
-            qntdAtual = 1;
-        }
-
-        if (qntdAtual > 0) {
-
-            // obter a categoria ativa
-            var categoria = $(".container-menu a.active").attr('id').split('menu-')[1];
-
-            // obtem a lista de itens
-            let filtro = MENU[categoria];
-
-            // obtem o item
-            let item = $.grep(filtro, (e, i) => { return e.id == id });
-
-            if (item.length > 0) {
-
-                // validar se já existe esse item no carrinho
-                let existe = $.grep(MEU_CARRINHO, (elem, index) => { return elem.id == id });
-
-                // caso já exista o item no carrinho, só altera a quantidade
-                if (existe.length > 0) {
-                    let objIndex = MEU_CARRINHO.findIndex((obj => obj.id == id));
-                    MEU_CARRINHO[objIndex].qntd = Math.min(
-                        MEU_CARRINHO[objIndex].qntd + qntdAtual,
-                        LIMITE_ITEM_CARRINHO
-                    );
-                }
-                // caso ainda não exista o item no carrinho, adiciona ele 
-                else {
-                    MEU_CARRINHO.push(Object.assign({}, item[0], {
-                        qntd: Math.min(qntdAtual, LIMITE_ITEM_CARRINHO)
-                    }));
-                }      
-                
-                cardapio.metodos.mensagem('Item adicionado ao carrinho', 'green')
-                $("#qntd-" + id).text(0);
-
-                cardapio.metodos.salvarEstado();
-                cardapio.metodos.atualizarBadgeTotal();
-
+        $.each(MENU, (categoria, itens) => {
+            let encontrado = itens.find(item => item.id === id);
+            if (encontrado) {
+                produto = encontrado;
+                return false;
             }
+        });
 
+        return produto;
+    },
+
+    // alterna entre o botão "Adicionar" e o seletor do item já incluído
+    sincronizarControlesCardapio: () => {
+        $(".card-item").each(function () {
+            let id = $(this).attr('data-produto-id');
+            let itemCarrinho = MEU_CARRINHO.find(item => item.id === id);
+            let quantidade = itemCarrinho ? itemCarrinho.qntd : 0;
+
+            $(this).find('.btn-adicionar-produto').toggleClass('hidden', quantidade > 0);
+            $(this).find('.controle-quantidade-card').toggleClass('hidden', quantidade <= 0);
+            $(this).find('.quantidade-card').text(quantidade);
+        });
+    },
+
+    // primeiro clique adiciona uma unidade imediatamente
+    adicionarAoCarrinho: (id) => {
+        let produto = cardapio.metodos.obterProdutoPorId(id);
+        if (!produto) return;
+
+        let objIndex = MEU_CARRINHO.findIndex(item => item.id === id);
+
+        if (objIndex >= 0) {
+            MEU_CARRINHO[objIndex].qntd = Math.min(MEU_CARRINHO[objIndex].qntd + 1, LIMITE_ITEM_CARRINHO);
+        }
+        else {
+            MEU_CARRINHO.push(Object.assign({}, produto, { qntd: 1 }));
         }
 
+        cardapio.metodos.salvarEstado();
+        cardapio.metodos.atualizarBadgeTotal();
+        cardapio.metodos.sincronizarControlesCardapio();
+        cardapio.metodos.mensagem('Adicionado ao carrinho', 'green', 1800);
+    },
+
+    // altera diretamente a quantidade do produto que já está no carrinho
+    alterarQuantidadeCardapio: (id, variacao) => {
+        let objIndex = MEU_CARRINHO.findIndex(item => item.id === id);
+        if (objIndex < 0) return;
+
+        let novaQuantidade = MEU_CARRINHO[objIndex].qntd + variacao;
+
+        if (novaQuantidade <= 0) {
+            MEU_CARRINHO.splice(objIndex, 1);
+        }
+        else {
+            MEU_CARRINHO[objIndex].qntd = Math.min(novaQuantidade, LIMITE_ITEM_CARRINHO);
+        }
+
+        cardapio.metodos.salvarEstado();
+        cardapio.metodos.atualizarBadgeTotal();
+        cardapio.metodos.sincronizarControlesCardapio();
+    },
+
+    diminuirQuantidade: (id) => {
+        cardapio.metodos.alterarQuantidadeCardapio(id, -1);
+    },
+
+    aumentarQuantidade: (id) => {
+        cardapio.metodos.alterarQuantidadeCardapio(id, 1);
     },
 
     // atualiza o badge de totais dos botões "Meu carrinho"
@@ -403,6 +408,7 @@ cardapio.metodos = {
 
         // atualiza o botão carrinho com a quantidade atualizada
         cardapio.metodos.atualizarBadgeTotal();
+        cardapio.metodos.sincronizarControlesCardapio();
         
     },
 
@@ -422,6 +428,7 @@ cardapio.metodos = {
 
         // atualiza os valores (R$) totais do carrinho
         cardapio.metodos.carregarValores();
+        cardapio.metodos.sincronizarControlesCardapio();
 
     },
 
@@ -460,6 +467,7 @@ cardapio.metodos = {
             // O carrinho em memória ainda é limpo normalmente.
         }
         cardapio.metodos.carregarCarrinho();
+        cardapio.metodos.sincronizarControlesCardapio();
         cardapio.metodos.mensagem('Carrinho limpo.');
     },
 
@@ -754,7 +762,7 @@ cardapio.templates = {
 
     item: `
         <div class="col-12 col-lg-3 col-md-3 col-sm-6 mb-5 animated fadeInUp">
-            <div class="card card-item" id="\${id}">
+            <div class="card card-item" id="\${id}" data-produto-id="\${id}">
                 <div class="img-produto">
                     <img src="\${img}" alt="\${nome}" loading="lazy" />
                 </div>
@@ -765,10 +773,14 @@ cardapio.templates = {
                     <b>\${preco}</b>
                 </p>
                 <div class="add-carrinho">
-                    <button type="button" class="btn-menos" aria-label="Diminuir quantidade" onclick="cardapio.metodos.diminuirQuantidade('\${id}')"><i class="fas fa-minus"></i></button>
-                    <span class="add-numero-itens" id="qntd-\${id}">0</span>
-                    <button type="button" class="btn-mais" aria-label="Aumentar quantidade" onclick="cardapio.metodos.aumentarQuantidade('\${id}')"><i class="fas fa-plus"></i></button>
-                    <button type="button" class="btn btn-add" aria-label="Adicionar ao carrinho" title="Adicionar ao carrinho" onclick="cardapio.metodos.adicionarAoCarrinho('\${id}')"><i class="fa fa-shopping-bag"></i></button>
+                    <button type="button" class="btn btn-add btn-adicionar-produto" onclick="cardapio.metodos.adicionarAoCarrinho('\${id}')">
+                        <i class="fa fa-shopping-bag"></i> Adicionar
+                    </button>
+                    <div class="controle-quantidade-card hidden" aria-label="Quantidade no carrinho">
+                        <button type="button" class="btn-menos" aria-label="Remover uma unidade" onclick="cardapio.metodos.diminuirQuantidade('\${id}')"><i class="fas fa-minus"></i></button>
+                        <span class="add-numero-itens quantidade-card" aria-live="polite">0</span>
+                        <button type="button" class="btn-mais" aria-label="Adicionar mais uma unidade" onclick="cardapio.metodos.aumentarQuantidade('\${id}')"><i class="fas fa-plus"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
