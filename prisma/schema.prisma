@@ -32,7 +32,6 @@ model Order {
   paymentMethod      PaymentMethod
   changeForCents     Int?
   notes              String?
-  postalCode         String
   street             String
   number             String
   district           String
@@ -64,6 +63,7 @@ model OrderItem {
   productImage   String
   unitPriceCents Int
   quantity       Int
+  notes          String?
   totalCents     Int
   order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 

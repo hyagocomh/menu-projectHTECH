@@ -48,12 +48,15 @@ const testimonials: Testimonial[] = [
 
 const CART_KEY = "maknas-carrinho-v2";
 const LEGACY_CART_KEY = "maknas-carrinho-v1";
+const ITEM_NOTES_KEY = "maknas-observacoes-itens-v1";
 const MAX_QUANTITY = 99;
+const MAX_ITEM_NOTE_LENGTH = 200;
 
 export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: StorefrontProps) {
   const [activeCategory, setActiveCategory] = useState<CategoryId>("burgers");
   const [showAll, setShowAll] = useState(false);
   const [cart, setCart] = useState<Record<string, number>>({});
+  const [itemNotes, setItemNotes] = useState<Record<string, string>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
@@ -82,7 +85,16 @@ export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: Storefront
         const valid = Object.fromEntries(
           Object.entries(saved).filter(([, quantity]) => Number.isInteger(quantity) && quantity > 0),
         );
+        const parsedNotes = JSON.parse(localStorage.getItem(ITEM_NOTES_KEY) ?? "{}") as Record<string, unknown>;
+        const validNotes = Object.fromEntries(
+          Object.entries(parsedNotes).flatMap(([id, note]) =>
+            typeof note === "string" && note.trim() && valid[id]
+              ? [[id, note.slice(0, MAX_ITEM_NOTE_LENGTH)]]
+              : [],
+          ),
+        );
         setCart(valid);
+        setItemNotes(validNotes);
         if (!currentCart && legacyCart) localStorage.removeItem(LEGACY_CART_KEY);
       } catch {
         setCart({});
@@ -96,10 +108,11 @@ export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: Storefront
     if (!hydrated) return;
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      localStorage.setItem(ITEM_NOTES_KEY, JSON.stringify(itemNotes));
     } catch {
       // O carrinho continua em memória se o navegador bloquear localStorage.
     }
-  }, [cart, hydrated]);
+  }, [cart, hydrated, itemNotes]);
 
   useEffect(() => {
     document.body.classList.toggle("carrinho-aberto", cartOpen);
@@ -123,8 +136,8 @@ export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: Storefront
   const cartItems = useMemo<CartLine[]>(() =>
     Object.entries(cart).flatMap(([id, quantity]) => {
       const product = catalogIndex.get(id);
-      return product ? [{ ...product, quantity }] : [];
-    }), [cart, catalogIndex]);
+      return product ? [{ ...product, quantity, notes: itemNotes[id] ?? "" }] : [];
+    }), [cart, catalogIndex, itemNotes]);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -138,12 +151,34 @@ export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: Storefront
 
   const changeQuantity = (productId: string, quantity: number) => {
     const nextQuantity = Math.min(MAX_QUANTITY, Math.max(0, quantity));
+    if (nextQuantity === 0) {
+      setItemNotes((currentNotes) => {
+        const nextNotes = { ...currentNotes };
+        delete nextNotes[productId];
+        return nextNotes;
+      });
+    }
     setCart((current) => {
       const next = { ...current };
       if (nextQuantity === 0) delete next[productId];
       else next[productId] = nextQuantity;
       return next;
     });
+  };
+
+  const changeItemNotes = (productId: string, notes: string) => {
+    setItemNotes((current) => {
+      const next = { ...current };
+      const sanitized = notes.slice(0, MAX_ITEM_NOTE_LENGTH);
+      if (sanitized) next[productId] = sanitized;
+      else delete next[productId];
+      return next;
+    });
+  };
+
+  const clearCart = () => {
+    setCart({});
+    setItemNotes({});
   };
 
   const addProduct = (product: Product) => {
@@ -363,8 +398,9 @@ export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: Storefront
         whatsappNumber={whatsappNumber}
         onClose={() => setCartOpen(false)}
         onChangeQuantity={changeQuantity}
-        onClear={() => setCart({})}
-        onOrderCreated={() => setCart({})}
+        onChangeNotes={changeItemNotes}
+        onClear={clearCart}
+        onOrderCreated={clearCart}
         notify={notify}
       />}
     </>

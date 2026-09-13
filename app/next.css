@@ -147,6 +147,10 @@ footer a:not(.btn) {
   grid-column: span 3;
 }
 
+.field.span-4 {
+  grid-column: span 4;
+}
+
 .field small {
   color: rgba(255, 250, 240, 0.4);
   font-size: 9px;
@@ -398,6 +402,23 @@ footer a:not(.btn) {
   color: var(--color-primary) !important;
 }
 
+.review-product,
+.review-product > span,
+.review-product small {
+  display: block;
+}
+
+.review-product small {
+  margin-top: 5px;
+  color: var(--color-text-out);
+  font-size: 10px;
+}
+
+.review-product small i {
+  margin-right: 4px;
+  color: var(--color-primary);
+}
+
 .order-success {
   max-width: 680px;
   margin: 55px auto;
@@ -493,6 +514,7 @@ footer a:not(.btn) {
   .field.full,
   .field.span-2,
   .field.span-3,
+  .field.span-4,
   .field.span-6 {
     grid-column: auto;
   }
@@ -1015,6 +1037,22 @@ footer a:not(.btn) {
 .order-items-admin > div b,
 .order-items-admin > div strong {
   color: var(--color-white);
+}
+
+.order-item-admin-row > span > span,
+.order-item-admin-row small {
+  display: block;
+}
+
+.order-item-admin-row small {
+  max-width: 760px;
+  margin-top: 5px;
+  color: #f4a261;
+  line-height: 1.5;
+}
+
+.order-item-admin-row small i {
+  margin-right: 4px;
 }
 
 .order-items-admin .order-total-line {

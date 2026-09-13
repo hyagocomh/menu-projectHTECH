@@ -12,7 +12,6 @@ import {
 } from "@vis.gl/react-google-maps";
 
 export type CheckoutAddress = {
-  postalCode: string;
   street: string;
   number: string;
   district: string;
@@ -148,7 +147,6 @@ function MapContent({
     ]);
 
     onAddressChange({
-      postalCode: componentText(components, ["postal_code"]),
       street: route || address.street,
       number: number || address.number,
       district: district || address.district,

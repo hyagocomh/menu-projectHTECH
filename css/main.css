@@ -1196,7 +1196,7 @@ footer {
 
 .modal-full .item-carrinho {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 19px 0;
     border-bottom: 1px solid var(--color-separate);
@@ -1249,10 +1249,45 @@ footer {
     padding: 0 24px;
 }
 
+.item-note-field {
+    display: block;
+    max-width: 680px;
+    margin: 10px 0 0;
+}
+
+.item-note-field > span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-text-out);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.item-note-field > span i {
+    margin-right: 5px;
+    color: var(--color-primary);
+}
+
+.item-note-field > span small {
+    font-size: 9px;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.item-note-input.form-control {
+    min-height: 54px;
+    padding: 9px 12px;
+    resize: vertical;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
 .modal-full .add-carrinho {
     display: flex;
     height: 31px;
     align-items: center;
+    align-self: center;
     justify-content: center;
     text-align: center;
 }

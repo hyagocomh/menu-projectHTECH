@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 export function AdminLogin({ configured }: { configured: boolean }) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -20,7 +20,7 @@ export function AdminLogin({ configured }: { configured: boolean }) {
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error || "Não foi possível entrar.");
@@ -43,12 +43,12 @@ export function AdminLogin({ configured }: { configured: boolean }) {
         {!configured && (
           <div className="admin-config-warning">
             <i className="fas fa-tools" />
-            <span>Configure <b>AUTH_SECRET</b>, <b>ADMIN_EMAIL</b> e <b>ADMIN_PASSWORD_HASH</b> na Vercel.</span>
+            <span>Configure <b>AUTH_SECRET</b>, <b>ADMIN_USERNAME</b> e <b>ADMIN_PASSWORD_HASH</b> na Vercel.</span>
           </div>
         )}
         <form onSubmit={submit}>
-          <label className="field">E-mail
-            <input className="form-control" type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} />
+          <label className="field">Usuário
+            <input className="form-control" type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={100} required value={username} onChange={(event) => setUsername(event.target.value)} />
           </label>
           <label className="field">Senha
             <input className="form-control" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} />

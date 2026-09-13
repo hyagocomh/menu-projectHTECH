@@ -6,7 +6,7 @@ import type { Product } from "@/lib/catalog";
 import { formatMoneyFromCents } from "@/lib/money";
 import { AddressMap, type CheckoutAddress } from "./AddressMap";
 
-export type CartLine = Product & { quantity: number };
+export type CartLine = Product & { quantity: number; notes: string };
 
 type Quote = {
   distanceMeters: number;
@@ -30,13 +30,13 @@ type CartModalProps = {
   whatsappNumber: string;
   onClose: () => void;
   onChangeQuantity: (productId: string, quantity: number) => void;
+  onChangeNotes: (productId: string, notes: string) => void;
   onClear: () => void;
   onOrderCreated: () => void;
   notify: (message: string, kind?: "red" | "green") => void;
 };
 
 const EMPTY_ADDRESS: CheckoutAddress = {
-  postalCode: "",
   street: "",
   number: "",
   district: "",
@@ -50,11 +50,6 @@ const EMPTY_ADDRESS: CheckoutAddress = {
 
 function onlyDigits(value: string) {
   return value.replace(/\D/g, "");
-}
-
-function formatCep(value: string) {
-  const digits = onlyDigits(value).slice(0, 8);
-  return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
 }
 
 function formatPhone(value: string) {
@@ -88,6 +83,7 @@ export function CartModal({
   whatsappNumber,
   onClose,
   onChangeQuantity,
+  onChangeNotes,
   onClear,
   onOrderCreated,
   notify,
@@ -102,7 +98,6 @@ export function CartModal({
   const [quote, setQuote] = useState<Quote | null>(null);
   const [quoteState, setQuoteState] = useState<"idle" | "loading" | "error">("idle");
   const [quoteError, setQuoteError] = useState("");
-  const [cepLoading, setCepLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [orderCode, setOrderCode] = useState("");
@@ -186,7 +181,6 @@ export function CartModal({
         address.district,
         address.city,
         address.state,
-        formatCep(address.postalCode),
         "Brasil",
       ].filter(Boolean).join(", "));
     }, 650);
@@ -196,7 +190,6 @@ export function CartModal({
     address.city,
     address.district,
     address.number,
-    address.postalCode,
     address.state,
     address.street,
     mapsApiKey,
@@ -204,52 +197,15 @@ export function CartModal({
 
   if (!open) return null;
 
-  const searchCep = async () => {
-    const cep = onlyDigits(address.postalCode);
-    if (cep.length !== 8) {
-      notify("Informe um CEP válido.");
-      return;
-    }
-    setCepLoading(true);
-    try {
-      const response = await fetch(`/api/address/cep/${cep}`);
-      const data = (await response.json()) as Partial<CheckoutAddress> & { error?: string };
-      if (!response.ok) throw new Error(data.error || "CEP não encontrado.");
-      updateAddress({
-        postalCode: data.postalCode ?? address.postalCode,
-        street: data.street ?? "",
-        district: data.district ?? "",
-        city: data.city ?? "",
-        state: data.state ?? "",
-        latitude: null,
-        longitude: null,
-      });
-      setGeocodeQuery("");
-      notify(
-        mapsApiKey
-          ? address.number.trim()
-            ? "Endereço preenchido e mapa atualizado."
-            : "Endereço preenchido. Digite o número para posicionar no mapa."
-          : "Endereço preenchido pelo CEP.",
-        "green",
-      );
-    } catch (error) {
-      notify(error instanceof Error ? error.message : "Não foi possível buscar o CEP.");
-    } finally {
-      setCepLoading(false);
-    }
-  };
-
   const validateDetails = () => {
     if (customer.name.trim().length < 2) return "Informe seu nome.";
     if (onlyDigits(customer.phone).length < 10) return "Informe um WhatsApp válido.";
-    if (onlyDigits(address.postalCode).length !== 8) return "Informe um CEP válido.";
     if (!address.street.trim() || !address.number.trim()) return "Informe rua e número.";
     if (!address.district.trim() || !address.city.trim() || address.state.length !== 2) {
       return "Complete bairro, cidade e UF.";
     }
     if (address.latitude === null || address.longitude === null) {
-      return "Selecione o endereço no mapa ou busque o CEP.";
+      return "Selecione ou confirme o endereço no mapa.";
     }
     if (!quote) return quoteError || "Aguarde o cálculo da entrega.";
     return "";
@@ -266,9 +222,10 @@ export function CartModal({
 
   const whatsappUrl = (code = orderCode, finalTotal = orderTotalCents || totalCents) => {
     const messageItems = submittedItems.length > 0 ? submittedItems : items;
-    const lines = messageItems.map((item) =>
+    const lines = messageItems.flatMap((item) => [
       `• ${item.quantity}x ${item.name} — ${formatMoneyFromCents(Math.round(item.price * 100) * item.quantity)}`,
-    );
+      ...(item.notes.trim() ? [`  _Observação: ${item.notes.trim()}_`] : []),
+    ]);
     const text = [
       `Olá! Fiz o pedido *${code || "pela loja online"}* na Makna's Burguer 🔥`,
       "",
@@ -276,7 +233,7 @@ export function CartModal({
       "",
       `*Total:* ${formatMoneyFromCents(finalTotal)}`,
       `*Entrega:* ${address.street}, ${address.number} — ${address.district}`,
-      `${address.city}-${address.state} · CEP ${formatCep(address.postalCode)}`,
+      `${address.city}-${address.state}`,
     ].join("\n");
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
   };
@@ -303,7 +260,6 @@ export function CartModal({
           },
           address: {
             ...address,
-            postalCode: onlyDigits(address.postalCode),
             formattedAddress: address.formattedAddress || [
               address.street,
               address.number,
@@ -312,7 +268,11 @@ export function CartModal({
               address.state,
             ].filter(Boolean).join(", "),
           },
-          items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
+          items: items.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            notes: item.notes.trim(),
+          })),
           paymentMethod,
           changeForCents: paymentMethod === "CASH" && changeFor
             ? Math.round(Number(changeFor.replace(",", ".")) * 100)
@@ -383,6 +343,17 @@ export function CartModal({
                       <span>{formatMoneyFromCents(Math.round(item.price * 100))} cada</span>
                       <b>{formatMoneyFromCents(Math.round(item.price * 100) * item.quantity)}</b>
                     </p>
+                    <label className="item-note-field">
+                      <span><i className="fas fa-comment-alt" /> Observação deste item <small>opcional</small></span>
+                      <textarea
+                        className="form-control item-note-input"
+                        rows={2}
+                        maxLength={200}
+                        placeholder="Ex.: sem alface, sem tomate, molho separado..."
+                        value={item.notes}
+                        onChange={(event) => onChangeNotes(item.id, event.target.value)}
+                      />
+                    </label>
                   </div>
                   <div className="add-carrinho">
                     <button className="btn-menos" type="button" aria-label={`Diminuir ${item.name}`} onClick={() => onChangeQuantity(item.id, item.quantity - 1)}>
@@ -419,21 +390,13 @@ export function CartModal({
 
                 <p className="checkout-section-title"><span>2</span> Endereço</p>
                 <div className="form-grid cols-6">
-                  <label className="field span-2">CEP
-                    <div className="input-action">
-                      <input className="form-control" inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" value={formatCep(address.postalCode)} onChange={(event) => updateAddress({ postalCode: event.target.value, latitude: null, longitude: null })} />
-                      <button type="button" onClick={searchCep} disabled={cepLoading} aria-label="Buscar CEP">
-                        <i className={`fas ${cepLoading ? "fa-spinner fa-spin" : "fa-search"}`} />
-                      </button>
-                    </div>
-                  </label>
-                  <label className="field span-3">Rua
+                  <label className="field span-4">Rua
                     <input className="form-control" autoComplete="address-line1" value={address.street} onChange={(event) => updateAddress({ street: event.target.value, latitude: null, longitude: null })} />
                   </label>
-                  <label className="field">Número
+                  <label className="field span-2">Número
                     <input className="form-control" autoComplete="address-line2" value={address.number} onChange={(event) => updateAddress({ number: event.target.value, latitude: null, longitude: null })} />
                   </label>
-                  <label className="field span-2">Bairro
+                  <label className="field span-3">Bairro
                     <input className="form-control" value={address.district} onChange={(event) => updateAddress({ district: event.target.value, latitude: null, longitude: null })} />
                   </label>
                   <label className="field span-2">Cidade
@@ -464,8 +427,8 @@ export function CartModal({
                     <input className="form-control" inputMode="decimal" placeholder="Ex.: 100,00" value={changeFor} onChange={(event) => setChangeFor(event.target.value)} />
                   </label>
                 )}
-                <label className="field notes-field">Observações <small>opcional</small>
-                  <textarea className="form-control" rows={3} maxLength={500} placeholder="Ponto da carne, retirar ingrediente, referência..." value={notes} onChange={(event) => setNotes(event.target.value)} />
+                <label className="field notes-field">Observações gerais <small>opcional</small>
+                  <textarea className="form-control" rows={3} maxLength={500} placeholder="Referência da entrega ou recado geral para a loja..." value={notes} onChange={(event) => setNotes(event.target.value)} />
                 </label>
               </div>
 
@@ -497,7 +460,7 @@ export function CartModal({
                 <p className="checkout-section-title"><span><i className="fas fa-shopping-bag" /></span> Itens</p>
                 {items.map((item) => (
                   <div className="review-line" key={item.id}>
-                    <span><b>{item.quantity}x</b> {item.name}</span>
+                    <span className="review-product"><span><b>{item.quantity}x</b> {item.name}</span>{item.notes && <small><i className="fas fa-comment-alt" /> {item.notes}</small>}</span>
                     <b>{formatMoneyFromCents(Math.round(item.price * 100) * item.quantity)}</b>
                   </div>
                 ))}
@@ -505,7 +468,7 @@ export function CartModal({
               <div className="review-card">
                 <p className="checkout-section-title"><span><i className="fas fa-map-marker-alt" /></span> Entrega</p>
                 <p><b>{customer.name}</b> · {customer.phone}</p>
-                <p>{address.street}, {address.number} — {address.district}<br />{address.city}-{address.state} · {formatCep(address.postalCode)}</p>
+                <p>{address.street}, {address.number} — {address.district}<br />{address.city}-{address.state}</p>
                 {address.complement && <p>Complemento: {address.complement}</p>}
                 <p className="review-route"><i className="fas fa-route" /> {quote?.distanceLabel} · {quote?.durationLabel}</p>
               </div>

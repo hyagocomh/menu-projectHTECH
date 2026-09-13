@@ -152,7 +152,7 @@ export function OrderBoard({ initialOrders, initialError }: { initialOrders: Ser
               <details className="order-details">
                 <summary><span><i className="fas fa-hamburger" /> {order.items.reduce((sum, item) => sum + item.quantity, 0)} itens</span><span>Ver detalhes <i className="fas fa-chevron-down" /></span></summary>
                 <div className="order-items-admin">
-                  {order.items.map((item) => <div key={item.id}><span><b>{item.quantity}x</b> {item.productName}</span><strong>{formatMoneyFromCents(item.totalCents)}</strong></div>)}
+                  {order.items.map((item) => <div className="order-item-admin-row" key={item.id}><span><span><b>{item.quantity}x</b> {item.productName}</span>{item.notes && <small><i className="fas fa-comment-alt" /> {item.notes}</small>}</span><strong>{formatMoneyFromCents(item.totalCents)}</strong></div>)}
                   <div className="order-total-line"><span>Subtotal</span><strong>{formatMoneyFromCents(order.subtotalCents)}</strong></div>
                   <div><span>Entrega</span><strong>{formatMoneyFromCents(order.deliveryFeeCents)}</strong></div>
                   {order.notes && <p className="order-notes"><i className="fas fa-comment-alt" /> <b>Observação:</b> {order.notes}</p>}

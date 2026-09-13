@@ -41,7 +41,7 @@ Use o resultado em `AUTH_SECRET`. Depois gere o hash da senha:
 npm run admin:hash -- "uma-senha-forte"
 ```
 
-Cadastre o resultado em `ADMIN_PASSWORD_HASH` e o e-mail desejado em `ADMIN_EMAIL`. Nunca cadastre a senha em texto puro.
+Cadastre o resultado em `ADMIN_PASSWORD_HASH` e o usuário desejado em `ADMIN_USERNAME`. Nunca cadastre a senha em texto puro. A sessão expira após quatro horas e o login bloqueia tentativas repetidas.
 
 ### Google Maps e cálculo de entrega
 

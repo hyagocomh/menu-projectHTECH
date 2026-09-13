@@ -4,16 +4,18 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
 export const ADMIN_COOKIE = "maknas-admin-session";
+const TOKEN_ISSUER = "maknas-burguer";
+const TOKEN_AUDIENCE = "maknas-admin";
 
 function authSecret() {
   const secret = process.env.AUTH_SECRET;
-  if (!secret || secret.length < 24) return null;
+  if (!secret || secret.length < 32) return null;
   return new TextEncoder().encode(secret);
 }
 
 export function isAdminConfigured() {
   return Boolean(
-    authSecret() && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD_HASH,
+    authSecret() && process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD_HASH,
   );
 }
 
@@ -23,8 +25,12 @@ export async function createAdminToken() {
 
   return new SignJWT({ role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(TOKEN_ISSUER)
+    .setAudience(TOKEN_AUDIENCE)
+    .setSubject("admin")
+    .setJti(crypto.randomUUID())
     .setIssuedAt()
-    .setExpirationTime("12h")
+    .setExpirationTime("4h")
     .sign(secret);
 }
 
@@ -33,8 +39,12 @@ export async function verifyAdminToken(token?: string) {
   if (!secret || !token) return false;
 
   try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload.role === "admin";
+    const { payload } = await jwtVerify(token, secret, {
+      algorithms: ["HS256"],
+      issuer: TOKEN_ISSUER,
+      audience: TOKEN_AUDIENCE,
+    });
+    return payload.role === "admin" && payload.sub === "admin";
   } catch {
     return false;
   }

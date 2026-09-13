@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         productImage: product.img,
         unitPriceCents,
         quantity: item.quantity,
+        notes: item.notes || null,
         totalCents: unitPriceCents * item.quantity,
       };
     });
@@ -50,7 +51,6 @@ export async function POST(request: Request) {
         paymentMethod: payload.paymentMethod,
         changeForCents: payload.paymentMethod === "CASH" ? payload.changeForCents : null,
         notes: payload.notes || null,
-        postalCode: payload.address.postalCode,
         street: payload.address.street,
         number: payload.address.number,
         district: payload.address.district,

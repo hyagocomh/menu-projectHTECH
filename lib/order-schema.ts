@@ -14,7 +14,6 @@ export const orderRequestSchema = z.object({
     email: z.union([z.literal(""), z.string().trim().email().max(160)]).optional(),
   }),
   address: z.object({
-    postalCode: z.string().transform((value) => value.replace(/\D/g, "")).pipe(z.string().length(8)),
     street: z.string().trim().min(2).max(160),
     number: z.string().trim().min(1).max(20),
     district: z.string().trim().min(2).max(100),
@@ -27,6 +26,7 @@ export const orderRequestSchema = z.object({
   items: z.array(z.object({
     productId: z.string().min(1).max(180),
     quantity: z.number().int().min(1).max(99),
+    notes: z.string().trim().max(200).optional(),
   })).min(1).max(72),
   paymentMethod: z.enum(["PIX", "CARD", "CASH"]),
   changeForCents: z.number().int().positive().nullable().optional(),
