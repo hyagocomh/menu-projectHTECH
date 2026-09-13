@@ -1,182 +1,441 @@
+/* Notebooks e tablets grandes */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .nav-link {
+        padding-right: 12px !important;
+        padding-left: 12px !important;
+        font-size: 11px;
+    }
 
-/* Desktop (col-lg) 992px+ */
-@media (min-width: 992px) {
+    .nav-link::after {
+        right: 12px;
+        left: 12px;
+    }
 
+    .img-logo {
+        width: 96px;
+        height: 96px;
+    }
+
+    .banner {
+        min-height: 700px;
+        padding-top: 90px;
+    }
+
+    .text-banner h1 {
+        font-size: 72px;
+    }
+
+    .card-banner {
+        width: 430px;
+        height: 430px;
+    }
+
+    .banner .img-banner img {
+        top: -9px;
+        width: 445px;
+    }
+
+    .card-case {
+        bottom: 30px;
+    }
+
+    .card-item {
+        height: 350px;
+    }
+
+    .card-item .img-produto {
+        height: 180px;
+    }
+
+    .card-item .add-carrinho {
+        right: 10px;
+    }
+
+    .card-item .price-produto {
+        font-size: 17px;
+    }
 }
 
-/* Desktop e Tablets (col-md) 768px a 991px */
-@media (min-width: 768px) and (max-width: 991px) {
-
-}
-
-/* Tablets (col-sm) 576px a 767px */
-@media (min-width: 576px) and (max-width: 767px) {
-
-}
-
-/* Tablets e Celulares (col) 0px a 767px */
-@media (max-width: 767px) {
-
+/* Tablets e celulares */
+@media (max-width: 991px) {
     .no-mobile {
-        display: none!important;
+        display: none !important;
     }
 
-    .col-one {
-        padding-left: 35px!important;
-        padding-right: 35px!important;
+    .header {
+        position: relative;
     }
 
-    .navbar-toggler-icon {
-        padding-top: 5px;
+    .navbar {
+        min-height: 86px;
+    }
+
+    a.navbar-brand {
+        margin: -10px 0;
+    }
+
+    .img-logo {
+        width: 86px;
+        height: 86px;
     }
 
     .navbar-collapse {
-        background-color: var(--color-secondary);
-        padding: 20px;
+        margin: 11px 0 15px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 8px;
+        background: #131315;
+        box-shadow: 0 22px 45px rgba(0, 0, 0, 0.35);
         text-align: center;
-        border-radius: 40px;
+    }
+
+    .nav-link {
+        padding: 13px 15px !important;
+    }
+
+    .nav-link::after {
+        right: 42%;
+        bottom: 5px;
+        left: 42%;
     }
 
     .navbar-collapse .btn-white {
-        margin-top: 20px;
+        width: 100%;
+        margin-top: 14px;
     }
 
     .navbar-collapse .btn-icon {
         padding-right: 20px;
     }
 
-    .navbar-collapse .btn-icon span.icon {
+    .navbar-collapse .btn-icon .icon {
         display: none;
     }
 
     .banner {
-        padding-top: 50px;
-        padding-bottom: 50px;
+        min-height: auto;
+        padding: 88px 0 110px;
     }
 
-    .text-banner h1 {
-        font-size: 36px;
+    .text-banner {
+        max-width: 680px;
+        margin: 0 auto;
+        text-align: center;
     }
 
+    .hero-kicker {
+        justify-content: center;
+    }
+
+    .text-banner h1,
     .text-banner p {
-        font-size: 18px;
+        margin-right: auto;
+        margin-left: auto;
     }
 
-    .btn-yellow, .btn-white {
-        padding: 13px 23px;
-        font-size: 18px;
+    .hero-proof {
+        justify-content: center;
     }
 
-    .btn-icon-left span.icon-left {
-        width: 43px;
-        height: 43px;
-        margin-left: -56px;
+    .banner .col-one > .btn-social {
+        position: relative;
     }
 
-    .btn-icon-left {
-        padding-left: 63px!important;
+    .servicos,
+    .cardapio,
+    .depoimentos {
+        padding-top: 95px;
+        padding-bottom: 85px;
     }
 
-    .title {
-        font-size: 30px;
+    .service-card {
+        min-height: 310px;
     }
 
-    .servicos {
-        padding-bottom: 50px;
-    }
-
-    .cardapio {
-        padding-bottom: 50px;
-    }
-
-    .container-menu {
+    .cardapio .container-menu {
+        justify-content: flex-start;
         overflow-x: auto;
         overflow-y: hidden;
-        display: flex;
-        padding-bottom: 15px;
+        padding-bottom: 14px;
+        scrollbar-color: var(--color-primary) transparent;
+        scrollbar-width: thin;
     }
 
-    .img-produto {
-        position: absolute;
-        left: 15px
+    .cardapio .container-menu .btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
     }
 
-    .card-item {
-        height: 110px;
-        padding-left: 110px;
-        justify-content: center;
-        align-items: start;
-    }
-
-    .card-item .img-produto img {
-        width: 80px;
-    }
-
-    .title-produto {
-        margin-top: 0px!important;
-        height: 30px!important;
-        width: 100%;
-        text-align: left!important;
-    }
-
-    .price-produto {
-        margin-bottom: 0px!important;
-        margin-top: 0px!important;
-        font-size: 22px!important;
-    }
-
-    .card-item .add-carrinho {
-        margin-top: 5px;
-    }
-
-    #itensCardapio .mb-5 {
-        margin-bottom: 15px!important;
-    }
-
-    .depoimentos {
-        padding-bottom: 50px;
+    .depoimento {
+        min-height: 255px;
     }
 
     .reserva {
-        padding-bottom: 50px;
+        padding: 80px 0 95px;
     }
 
     .card-secondary {
-        padding: 45px;
-        border-radius: 50px;
+        padding: 62px 54px;
     }
 
-    .container-logo-footer {
+    .card-secondary p {
+        padding-right: 0 !important;
+    }
+
+    .container-logo-footer,
+    .container-texto-footer,
+    .container-redes-footer {
         justify-content: center;
+    }
+
+    .container-redes-footer {
+        margin-top: 24px;
+        margin-bottom: 14px;
+    }
+}
+
+/* Celulares */
+@media (max-width: 767px) {
+    .col-one {
+        padding-right: 24px !important;
+        padding-left: 24px !important;
+    }
+
+    .header .container {
+        padding-right: 18px;
+        padding-left: 18px;
+    }
+
+    .navbar {
+        min-height: 78px;
+    }
+
+    .img-logo {
+        width: 76px;
+        height: 76px;
+    }
+
+    .banner {
+        padding: 72px 0 95px;
+    }
+
+    .banner::before {
+        top: 140px;
+        left: -10px;
+        font-size: 118px;
+    }
+
+    .hero-kicker {
+        margin-bottom: 18px;
+        font-size: 10px;
+        letter-spacing: 0.15em;
+    }
+
+    .hero-kicker::before {
+        width: 25px;
+        margin-right: 9px;
+    }
+
+    .hero-kicker i {
+        margin: 0 7px;
+    }
+
+    .text-banner h1 {
+        font-size: clamp(48px, 15vw, 66px);
+        line-height: 0.95;
+    }
+
+    .text-banner p {
+        margin-top: 22px;
+        font-size: 15px;
+        line-height: 1.65;
+    }
+
+    .text-banner .btn {
+        width: 100%;
+        margin-right: 0 !important;
+    }
+
+    .text-banner .btn-icon-left {
+        margin-top: 12px !important;
+    }
+
+    .hero-proof {
+        display: grid;
+        gap: 9px;
+        margin-top: 29px;
+    }
+
+    .banner .col-one > .btn-social {
+        margin-top: 25px !important;
+    }
+
+    .hint-title {
+        font-size: 10px;
+        letter-spacing: 0.18em;
+    }
+
+    .hint-title::before,
+    .hint-title::after {
+        width: 18px;
+        margin: 0 8px;
+    }
+
+    .title {
+        margin-top: 10px;
+        font-size: 39px;
+    }
+
+    .servicos,
+    .cardapio,
+    .depoimentos {
+        padding-top: 78px;
+        padding-bottom: 66px;
+    }
+
+    .service-card {
+        min-height: 288px;
+        padding: 38px 28px 32px;
+    }
+
+    .service-card:hover,
+    .service-card.featured {
+        transform: none;
+    }
+
+    .cardapio .container-menu {
+        margin-bottom: 30px;
+    }
+
+    #itensCardapio .mb-5 {
+        margin-bottom: 15px !important;
+    }
+
+    .card-item {
+        height: 138px;
+        min-height: 138px;
+        padding: 12px 12px 12px 126px;
+    }
+
+    .card-item:hover {
+        transform: none;
+    }
+
+    .card-item::before {
+        right: 15px;
+    }
+
+    .card-item .img-produto {
+        position: absolute;
+        top: 12px;
+        bottom: 12px;
+        left: 12px;
+        width: 100px;
+        height: auto;
+    }
+
+    .card-item .title-produto {
+        width: 100%;
+        height: 39px;
+        margin-top: 3px;
+        padding-right: 0;
+        font-size: 13px;
+        white-space: normal;
+    }
+
+    .card-item .price-produto {
+        margin-top: 1px;
+        font-size: 16px;
+    }
+
+    .card-item .add-carrinho {
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .btn-menos,
+    .btn-mais,
+    .add-numero-itens,
+    .btn-add {
+        height: 27px;
+    }
+
+    .add-numero-itens {
+        min-width: 27px;
+        font-size: 12px;
+    }
+
+    .depoimento {
+        min-height: 310px;
+        margin-top: 28px;
+        padding: 22px 18px;
+    }
+
+    .texto-depoimento i:last-child {
+        display: none;
+    }
+
+    .texto-depoimento i:first-child {
+        padding-right: 14px;
+    }
+
+    .reserva {
+        padding: 60px 0 75px;
+    }
+
+    .card-secondary {
+        padding: 47px 30px;
+        text-align: center;
+    }
+
+    .card-secondary::before {
+        right: -70%;
+    }
+
+    .card-secondary .title {
+        font-size: 43px;
+    }
+
+    .card-secondary p {
+        font-size: 14px;
+    }
+
+    .logo-footer {
+        width: 96px;
+        height: 96px;
     }
 
     .container-texto-footer p {
         text-align: center;
     }
 
-    .container-redes-footer {
-        margin-top: 40px;
-        margin-bottom: 50px;
-        justify-content: center;
-    }
-
     .whatsapp-widget {
-        right: 20px;
-        bottom: 120px;
+        right: 18px;
+        bottom: 90px;
     }
 
     .whatsapp-mini-menu {
-        width: calc(100vw - 40px);
+        width: calc(100vw - 36px);
         max-width: 340px;
     }
 
+    .botao-carrinho {
+        right: 18px;
+        bottom: 23px;
+    }
+
     .modal-full {
-        padding: 40px;
+        padding: 24px 18px 34px;
+    }
+
+    .logo-modal {
+        width: 62px;
+        height: 62px;
     }
 
     .modal-full .item-carrinho {
-        padding-left: 0;
         padding-right: 0;
+        padding-left: 0;
     }
 
     .modal-full .img-produto {
@@ -185,25 +444,61 @@
     }
 
     .modal-full .img-produto img {
-        width: 50px;
+        width: 54px;
+        height: 50px;
     }
 
     .modal-full .dados-produto {
-        padding-left: 15px;
-        padding-right: 15px;
         display: grid;
+        min-width: 0;
+        padding-right: 10px;
+        padding-left: 12px;
     }
 
-    .modal-full .title-produto, .modal-full .price-produto {
-        font-size: 16px!important;
+    .modal-full .title-produto,
+    .modal-full .price-produto {
+        font-size: 14px;
     }
 
     .modal-full .add-numero-itens {
-        padding: 2px 10px;
+        padding-right: 7px;
+        padding-left: 7px;
     }
 
     .modal-full .form-control {
-        font-size: 16px;
+        font-size: 15px;
     }
 
+    .m-footer .btn {
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 380px) {
+    .col-one {
+        padding-right: 18px !important;
+        padding-left: 18px !important;
+    }
+
+    .text-banner h1 {
+        font-size: 45px;
+    }
+
+    .hero-kicker::before {
+        display: none;
+    }
+
+    .card-item {
+        padding-left: 110px;
+    }
+
+    .card-item .img-produto {
+        width: 86px;
+    }
+
+    .btn-menos,
+    .btn-mais {
+        padding-right: 6px;
+        padding-left: 6px;
+    }
 }

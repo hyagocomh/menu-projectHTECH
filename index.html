@@ -5,7 +5,10 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Restaurante - Seja bem-vindo!</title>
+        <title>Makna's Burguer | Sabor de verdade</title>
+        <meta name="description" content="Makna's Burguer: burgers artesanais, ingredientes selecionados e muito sabor direto da brasa." />
+        <meta name="theme-color" content="#080808" />
+        <link rel="icon" type="image/png" href="./img/logo-maknas.png" />
 
         <link rel="stylesheet" href="./css/bootstrap.min.css" />
         <link rel="stylesheet" href="./css/fontawesome.css" />
@@ -62,8 +65,8 @@
         <section class="header">
             <div class="container">
                 <nav class="navbar navbar-expand-lg pl-0 pr-0 col-one">
-                    <a class="navbar-brand wow fadeIn" href="#">
-                        <img src="./img/logo.png" width="160" class="img-logo" />
+                    <a class="navbar-brand wow fadeIn" href="#" aria-label="Makna's Burguer - início">
+                        <img src="./img/logo-maknas.png" class="img-logo" alt="Logo Makna's Burguer" />
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown">
                         <span class="navbar-toggler-icon">
@@ -73,10 +76,7 @@
                     <div class="collapse navbar-collapse" id="navbarNavDropdown">
                         <ul class="navbar-nav ml-auto mr-auto wow fadeIn">
                             <li class="nav-item">
-                                <a href="#reservas" class="nav-link"><b>Reservas</b></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#servicos" class="nav-link"><b>Serviços</b></a>
+                                <a href="#servicos" class="nav-link"><b>A experiência</b></a>
                             </li>
                             <li class="nav-item">
                                 <a href="#cardapio" class="nav-link"><b>Cardápio</b></a>
@@ -84,9 +84,12 @@
                             <li class="nav-item">
                                 <a href="#depoimentos" class="nav-link"><b>Depoimentos</b></a>
                             </li>
+                            <li class="nav-item">
+                                <a href="#reservas" class="nav-link"><b>Reservas</b></a>
+                            </li>
                         </ul>
                         <a class="btn btn-white btn-icon wow fadeIn" onclick="cardapio.metodos.abrirCarrinho(true)">
-                            Meu carrinho <span class="icon">
+                            Meu pedido <span class="icon">
                                 <div class="container-total-carrinho badge-total-carrinho hidden">0</div>
                                 <i class="fa fa-shopping-bag"></i>
                             </span>
@@ -101,13 +104,14 @@
                 <div class="row">
                     <div class="col-12 col-lg-6 col-md-6 col-sm-12 col-one">
                         <div class="d-flex text-banner">
-                            <h1 class="wow fadeInLeft"><b>Escolha sua comida <b class="color-primary">favorita.</b></b></h1>
+                            <span class="hero-kicker wow fadeInLeft">Desde 2026 <i></i> feito na brasa</span>
+                            <h1 class="wow fadeInLeft">Brasa alta.<br><span class="color-primary">Sabor de verdade.</span></h1>
                             <p class="wow fadeInLeft delay-02s">
-                                Aproveite nosso cardápio! Escolha o que desejar e recebe em sua casa de forma rápida e segura.
+                                Burgers artesanais, ingredientes selecionados e aquele sabor marcante que só a Makna's tem.
                             </p>
                             <div class="wow fadeIn delay-05s">
-                                <a class="btn btn-yellow mt-4 mr-3">
-                                    Ver cardápio
+                                <a href="#cardapio" class="btn btn-yellow mt-4 mr-3">
+                                    Explorar cardápio <i class="fas fa-arrow-right"></i>
                                 </a>
                                 <a href="#" class="btn btn-white btn-icon-left mt-4" id="btnLigar">
                                     <span class="icon-left">
@@ -115,6 +119,11 @@
                                     </span>
                                     (82) 99962-7481
                                 </a>
+                            </div>
+                            <div class="hero-proof wow fadeIn delay-07s">
+                                <span><i class="fas fa-fire"></i> Burger na brasa</span>
+                                <span><i class="fas fa-star"></i> Ingredientes frescos</span>
+                                <span><i class="fas fa-motorcycle"></i> Entrega rápida</span>
                             </div>
                         </div>
                         <a href="https://www.instagram.com/hyagotech/" target="_blank" class="btn btn-sm btn-white btn-social mt-4 mr-3 wow fadeIn delay-05s">
@@ -128,15 +137,14 @@
                         </a>
                     </div>
 
-                    <div class="col-6 no-mobile">
+                    <div class="col-6 no-mobile hero-visual">
                         <div class="card-banner wow fadeIn delay-02s"></div>
                         <div class="d-flex img-banner wow fadeIn delay-05s">
-                            <img src="./img/burguer.png" />
+                            <img src="./img/logo-maknas.png" alt="Emblema Makna's Burguer" />
                         </div>
                         <div class="card card-case wow fadeInRight delay-07s">
-                            "Entrega rápida e funcionários simpáticos.
-                            <br>A comida chegou quente e <br>
-                            muito saborosa!"
+                            <span class="case-stars">★★★★★</span>
+                            “Chegou quente, suculento e com sabor de brasa de verdade.”
                             <span class="card-case-name">
                                 <b>Thiago Lopes</b>
                             </span>
@@ -154,45 +162,42 @@
                 <div class="row">
 
                     <div class="col-12 col-one text-center mb-5 wow fadeIn">
-                        <span class="hint-title"><b>Serviços</b></span>
+                        <span class="hint-title"><b>O jeito Makna's</b></span>
                         <h1 class="title">
-                            <b>Como são nossos serviços?</b>
+                            <b>Da nossa brasa para a sua mesa</b>
                         </h1>
                     </div>
 
                     <div class="col-12 col-lg-4 col-md-4 col-sm-12 col-one mb-5 wow fadeInUp">
-                        <div class="card-icon text-center">
-                            <img src="./img/icone-pedido.svg" width="150" />
-                        </div>
-                        <div class="card-text text-center mt-3">
-                            <p><b>Fácil de pedir</b></p>
-                            <span>
-                                Você só precisa de alguns passos para pedir sua comida.
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-lg-4 col-md-4 col-sm-12 col-one mb-5 wow fadeInUp">
-                        <div class="card-icon text-center">
-                            <img src="./img/icone-delivery.svg" width="250" />
-                        </div>
-                        <div class="card-text text-center mt-3">
-                            <p><b>Entrega rápida</b></p>
-                            <span>
-                                Nossa entrega é sempre pontual, rápida e segura.
-                            </span>
+                        <div class="service-card">
+                            <span class="service-number">01</span>
+                            <div class="card-icon text-center"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="card-text text-center mt-3">
+                                <p><b>Peça sem complicação</b></p>
+                                <span>Escolha seus favoritos e monte o pedido em poucos cliques.</span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="col-12 col-lg-4 col-md-4 col-sm-12 col-one mb-5 wow fadeInUp">
-                        <div class="card-icon text-center">
-                            <img src="./img/icone-qualidade.svg" width="250" />
+                        <div class="service-card featured">
+                            <span class="service-number">02</span>
+                            <div class="card-icon text-center"><i class="fas fa-motorcycle"></i></div>
+                            <div class="card-text text-center mt-3">
+                                <p><b>Quente até você</b></p>
+                                <span>Agilidade e cuidado para o seu burger chegar no ponto certo.</span>
+                            </div>
                         </div>
-                        <div class="card-text text-center mt-3">
-                            <p><b>Melhor qualidade</b></p>
-                            <span>
-                                Não só a rapidez na entrega, a qualidade também é o nosso forte.
-                            </span>
+                    </div>
+
+                    <div class="col-12 col-lg-4 col-md-4 col-sm-12 col-one mb-5 wow fadeInUp">
+                        <div class="service-card">
+                            <span class="service-number">03</span>
+                            <div class="card-icon text-center"><i class="fas fa-fire"></i></div>
+                            <div class="card-text text-center mt-3">
+                                <p><b>Sabor sem atalho</b></p>
+                                <span>Ingredientes selecionados e preparo artesanal em cada pedido.</span>
+                            </div>
                         </div>
                     </div>
 
@@ -208,15 +213,15 @@
                 <div class="row">
 
                     <div class="col-12 col-one text-center mb-5 wow fadeIn">
-                        <span class="hint-title"><b>Cardápio</b></span>
+                        <span class="hint-title"><b>Escolha seu favorito</b></span>
                         <h1 class="title">
-                            <b>Conheça o nosso cardápio</b>
+                            <b>Cardápio para matar a fome</b>
                         </h1>
                     </div>
 
                     <div class="col-12 col-one container-menu wow fadeInUp">
                         <a id="menu-burgers" class="btn btn-white btn-sm mr-3 active" onclick="cardapio.metodos.obterItensCardapio('burgers')">
-                            <i class="fas fa-hamburger"></i>&nbsp; Burgers
+                            <i class="fas fa-hamburger"></i>&nbsp; Burguers
                         </a>
                         <a id="menu-pizzas" class="btn btn-white btn-sm mr-3" onclick="cardapio.metodos.obterItensCardapio('pizzas')">
                             <i class="fas fa-pizza-slice"></i>&nbsp; Pizzas
@@ -245,7 +250,7 @@
                 
                     <div class="col-12 col-one text-center wow fadeInUp">
                         <a id="btnVerMais" class="btn btn-white btn-sm" onclick="cardapio.metodos.verMais()">
-                            Ver mais
+                            Ver cardápio completo
                         </a>
                     </div>
 
@@ -263,14 +268,14 @@
                     <div class="col-5 no-mobile text-center">
                         <div class="card-depoimentos wow fadeIn"></div>
                         <div class="d-flex img-banner wow fadeInLeft delay-02s">
-                            <img src="./img/pizzas.png" />
+                            <img src="./img/burguer.png" alt="Burger artesanal Makna's" />
                         </div>
                     </div>
 
                     <div class="col-12 col-lg-7 col-md-7 col-sm-12 col-one">
-                        <span class="hint-title wow fadeIn"><b>Depoimentos</b></span>
+                        <span class="hint-title wow fadeIn"><b>Quem prova, recomenda</b></span>
                         <h1 class="title wow fadeIn">
-                            <b>O que dizem sobre nós?</b>
+                            <b>Good food. Good people.</b>
                         </h1>
                         <div class="mb-5">
 
@@ -291,8 +296,8 @@
                                 <p class="texto-depoimento">
                                     <i class="fas fa-quote-left"></i>
                                     <span>
-                                        Muito bom, recomendo demais! Comida muito bem feita pelo chefe, 
-                                        atendimento dentro dos parâmetros e boa comunicação com o cliente.
+                                        Burger suculento, montagem caprichada e um molho da casa incrível.
+                                        A Makna's virou meu pedido oficial do fim de semana.
                                     </span>
                                     <i class="fas fa-quote-right"></i>
                                 </p>
@@ -315,8 +320,8 @@
                                 <p class="texto-depoimento">
                                     <i class="fas fa-quote-left"></i>
                                     <span>
-                                        Um jantar perfeito do começo ao fim. Comida, experiência, serviço...
-                                        foi tão maravilhoso que fomos dois dias seguidos - fato inédito para mim em uma viagem.
+                                        Tudo chegou muito bem embalado e ainda quente. Dá para sentir o sabor
+                                        da brasa em cada mordida. Experiência impecável.
                                     </span>
                                     <i class="fas fa-quote-right"></i>
                                 </p>
@@ -339,8 +344,8 @@
                                 <p class="texto-depoimento">
                                     <i class="fas fa-quote-left"></i>
                                     <span>
-                                        A comida estava excelente e o serviço gentil nos surpreendeu!
-                                        Dica: reserve umas 3 horas para ter uma experiência incrível.
+                                        O ponto da carne veio perfeito e o atendimento foi super atencioso.
+                                        Já indiquei para todo mundo — vale cada mordida.
                                     </span>
                                     <i class="fas fa-quote-right"></i>
                                 </p>
@@ -368,24 +373,23 @@
                             <div class="row">
 
                                 <div class="col-12 col-lg-7 col-md-7 col-sm-12">
-                                    <span class="hint-title"><b>Reserva</b></span>
+                                    <span class="hint-title"><b>Vem pra Makna's</b></span>
                                     <h1 class="title">
-                                        <b>Quer reservar um horário?</b>
+                                        <b>Sua mesa. Nossa brasa.</b>
                                     </h1>
                                     <p class="pr-5">
-                                        Mande uma mensagem clicando no botão abaixo
-                                        <br>
-                                        Reserve sua data e horário de forma simples e rápida.
+                                        Reúna sua turma e deixe o resto com a gente.
+                                        Reserve pelo WhatsApp de forma simples e rápida.
                                     </p>
                                     <a class="btn btn-yellow mt-4 wow fadeIn delay-05s" href="#" id="btnReserva" target="_blank">
-                                        Fazer reserva
+                                        Reservar agora <i class="fab fa-whatsapp"></i>
                                     </a>
                                 </div>
 
                                 <div class="col-5 no-mobile">
                                     <div class="card-reserva"></div>
                                     <div class="d-flex img-banner">
-                                        <img src="./img/icone-reserva.svg" />
+                                        <img src="./img/burguer.png" alt="Burger Makna's" />
                                     </div>
                                 </div>
 
@@ -403,12 +407,12 @@
                 <div class="row">
 
                     <div class="col-12 col-lg-3 col-md-3 col-sm-12 col-one container-logo-footer wow fadeIn">
-                        <img class="logo-footer" src="./img/logo.png" />
+                        <img class="logo-footer" src="./img/logo-maknas.png" alt="Makna's Burguer" />
                     </div>
 
                     <div class="col-12 col-lg-6 col-md-6 col-sm-12 col-one container-texto-footer wow fadeIn">
                         <p class="mb-0">
-                            <b>Menu On-line</b> &copy; Todos os direitos reservados
+                            <b>Makna's Burguer</b> &copy; 2026 · Good food, good people.
                         </p>
                     </div>
 
@@ -433,6 +437,7 @@
 
             <div class="m-header">
                 <div class="container">
+                    <img class="logo-modal" src="./img/logo-maknas.png" alt="Makna's Burguer" />
                     <a class="btn btn-white btn-sm float-right" onclick="cardapio.metodos.abrirCarrinho(false)">
                         Fechar
                     </a>
