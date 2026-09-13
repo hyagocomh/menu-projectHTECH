@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELED
+}
+
+enum PaymentMethod {
+  PIX
+  CARD
+  CASH
+}
+
+model Order {
+  id                 String        @id @default(cuid())
+  code               String        @unique
+  status             OrderStatus   @default(RECEIVED)
+  customerName       String
+  customerPhone      String
+  customerEmail      String?
+  paymentMethod      PaymentMethod
+  changeForCents     Int?
+  notes              String?
+  postalCode         String
+  street             String
+  number             String
+  district           String
+  city               String
+  state              String
+  complement         String?
+  formattedAddress   String
+  latitude           Float
+  longitude          Float
+  distanceMeters     Int
+  durationSeconds    Int
+  subtotalCents      Int
+  deliveryFeeCents   Int
+  totalCents         Int
+  deliveryProvider   String        @default("google-routes")
+  items              OrderItem[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  productId      String
+  productName    String
+  productImage   String
+  unitPriceCents Int
+  quantity       Int
+  totalCents     Int
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}

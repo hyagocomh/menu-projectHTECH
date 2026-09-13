@@ -880,6 +880,7 @@ a.navbar-brand {
     top: 25px;
     left: -18px;
     width: 500px;
+    height: auto;
     max-width: none;
     filter: drop-shadow(0 28px 22px rgba(0, 0, 0, 0.55));
 }
@@ -910,17 +911,17 @@ a.navbar-brand {
 }
 
 #depoimento-1 .imagem-depoimento {
-    background-image: url(../img/diego.jpg);
+    background-image: url('/img/diego.jpg');
     background-size: cover;
 }
 
 #depoimento-2 .imagem-depoimento {
-    background-image: url(../img/ana.jpg);
+    background-image: url('/img/ana.jpg');
     background-size: cover;
 }
 
 #depoimento-3 .imagem-depoimento {
-    background-image: url(../img/joao.jpg);
+    background-image: url('/img/joao.jpg');
     background-size: cover;
 }
 
@@ -1036,6 +1037,7 @@ a.navbar-brand {
     top: -8px;
     right: -65px;
     width: 440px;
+    height: auto;
     max-width: none;
     filter: drop-shadow(0 28px 22px rgba(0, 0, 0, 0.45));
 }
