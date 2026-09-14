@@ -169,6 +169,88 @@ footer a:not(.btn) {
   resize: vertical;
 }
 
+.address-autocomplete {
+  position: relative;
+  text-transform: none;
+}
+
+.address-autocomplete-input {
+  position: relative;
+}
+
+.address-autocomplete-input input {
+  padding-right: 42px;
+}
+
+.address-autocomplete-input > i {
+  position: absolute;
+  top: 24px;
+  right: 14px;
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+.address-autocomplete-suggestions {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  max-height: 238px;
+  overflow-y: auto;
+  border: 1px solid rgba(242, 13, 19, 0.32);
+  border-radius: 7px;
+  background: #fffdf9;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.42);
+}
+
+.address-autocomplete-suggestions button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 20px 1fr;
+  gap: 9px;
+  padding: 11px 13px;
+  border: 0;
+  border-bottom: 1px solid #eee9e2;
+  background: transparent;
+  color: #272326;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.address-autocomplete-suggestions button:last-child {
+  border-bottom: 0;
+}
+
+.address-autocomplete-suggestions button:hover,
+.address-autocomplete-suggestions button.active,
+.address-autocomplete-suggestions button:focus-visible {
+  outline: 0;
+  background: #f8eae8;
+}
+
+.address-autocomplete-suggestions i {
+  margin-top: 2px;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.address-autocomplete-help,
+.address-autocomplete-error {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255, 250, 240, 0.48) !important;
+  font-size: 9px !important;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.address-autocomplete-error {
+  color: #f4a261 !important;
+}
+
 .input-action {
   position: relative;
 }
@@ -934,6 +1016,151 @@ footer a:not(.btn) {
   font-size: 12px;
 }
 
+.store-settings-panel {
+  margin-top: 30px;
+  overflow: visible;
+  border: 1px solid rgba(255, 250, 240, 0.11);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 9px;
+  background: #131315;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+}
+
+.store-settings-panel > summary {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 20px;
+  color: var(--color-white);
+  cursor: pointer;
+  font-size: 12px;
+  list-style: none;
+}
+
+.store-settings-panel > summary::-webkit-details-marker { display: none; }
+
+.store-settings-panel > summary > span:first-child {
+  font-family: 'PoppinsMedium', Arial, sans-serif;
+  font-size: 14px;
+}
+
+.store-settings-panel > summary > span:first-child i {
+  margin-right: 8px;
+  color: var(--color-primary);
+}
+
+.store-settings-panel > summary > span:last-child {
+  color: var(--color-text-out);
+  font-size: 10px;
+  text-align: right;
+}
+
+.store-settings-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
+  gap: 24px;
+  padding: 24px 20px 22px;
+  border-top: 1px solid var(--color-separate);
+}
+
+.store-settings-form {
+  min-width: 0;
+}
+
+.store-settings-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.store-settings-heading h2 {
+  margin: 4px 0 0;
+  color: var(--color-white);
+  font-size: 22px;
+}
+
+.store-location-status {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(242, 13, 19, 0.11);
+  color: #ff6b6f;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.store-location-status i { margin-right: 4px; }
+
+.store-settings-intro {
+  margin: 12px 0 18px;
+  color: var(--color-text-out);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.store-settings-body .address-map,
+.store-settings-body .map-not-configured {
+  min-height: 390px;
+  height: 100%;
+}
+
+.store-coordinates {
+  display: flex;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.store-coordinates span {
+  min-width: 0;
+  flex: 1;
+  padding: 9px 11px;
+  border: 1px solid rgba(255, 250, 240, 0.08);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--color-text-out);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.store-coordinates b {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--color-white);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  text-transform: none;
+}
+
+.store-settings-warning,
+.store-settings-success {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(244, 162, 97, 0.28);
+  border-radius: 5px;
+  background: rgba(244, 162, 97, 0.07);
+  color: #f4a261;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.store-settings-success {
+  border-color: rgba(64, 206, 139, 0.28);
+  background: rgba(64, 206, 139, 0.07);
+  color: #40ce8b;
+}
+
+.store-settings-warning i,
+.store-settings-success i { margin-right: 6px; }
+
+.store-settings-form > .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1310,6 +1537,9 @@ footer a:not(.btn) {
 .empty-orders p { font-size: 12px; }
 
 @media (max-width: 900px) {
+  .store-settings-body { grid-template-columns: 1fr; }
+  .store-settings-body .address-map,
+  .store-settings-body .map-not-configured { min-height: 370px; }
   .admin-stats { grid-template-columns: repeat(2, 1fr); }
   .order-card-grid { grid-template-columns: 1fr 1fr; }
   .order-payment { grid-column: 1 / -1; }
@@ -1325,6 +1555,13 @@ footer a:not(.btn) {
   .admin-content { padding-top: 34px; }
   .admin-title-row { align-items: flex-start; flex-direction: column; gap: 4px; }
   .admin-title-row h1 { font-size: 46px; }
+  .store-settings-panel > summary { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .store-settings-panel > summary > span:last-child { text-align: left; }
+  .store-settings-body { padding: 18px 14px; }
+  .store-settings-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .store-coordinates { flex-direction: column; }
+  .store-settings-body .address-map,
+  .store-settings-body .map-not-configured { min-height: 320px; }
   .admin-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat-card { min-height: 84px; gap: 10px; padding: 13px; }
   .stat-card > i { width: 38px; height: 38px; }

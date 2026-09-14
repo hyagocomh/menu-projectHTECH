@@ -3,6 +3,7 @@ import { OrderBoard } from "@/components/admin/OrderBoard";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 import { serializeOrder } from "@/lib/orders";
+import { getStoreLocation } from "@/lib/store-settings";
 
 export const metadata = { title: "Painel de pedidos" };
 export const dynamic = "force-dynamic";
@@ -27,10 +28,20 @@ async function loadOrders() {
 export default async function AdminPage() {
   if (!await isAdminAuthenticated()) redirect("/admin/login");
 
-  if (!isDatabaseConfigured()) {
-    return <OrderBoard initialOrders={[]} initialError="Conecte um PostgreSQL e defina DATABASE_URL na Vercel." />;
+  const storeLocation = await getStoreLocation();
+  const databaseConfigured = isDatabaseConfigured();
+  const geoapifyMapKey = process.env.NEXT_PUBLIC_GEOAPIFY_MAP_KEY ?? "";
+  const dashboardProps = {
+    initialStoreLocation: storeLocation,
+    storeSettingsWritable: databaseConfigured,
+    geoapifyConfigured: Boolean(process.env.GEOAPIFY_API_KEY && geoapifyMapKey),
+    geoapifyMapKey,
+  };
+
+  if (!databaseConfigured) {
+    return <OrderBoard {...dashboardProps} initialOrders={[]} initialError="Conecte um PostgreSQL e defina DATABASE_URL na Vercel." />;
   }
 
   const result = await loadOrders();
-  return <OrderBoard initialOrders={result.orders} initialError={result.error || undefined} />;
+  return <OrderBoard {...dashboardProps} initialOrders={result.orders} initialError={result.error || undefined} />;
 }

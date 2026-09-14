@@ -25,7 +25,7 @@ Cadastre as variáveis de `.env.example` em **Project Settings > Environment Var
 2. Copie a conexão para `DATABASE_URL`.
 3. Execute `npm run db:deploy` com essa variável disponível para criar as tabelas.
 
-O painel lista os 100 pedidos mais recentes, atualiza automaticamente e permite mudar o status entre recebido, preparo, pronto, entrega, concluído e cancelado.
+O painel lista os 100 pedidos mais recentes, atualiza automaticamente e permite mudar o status entre recebido, preparo, pronto, entrega, concluído e cancelado. A seção **Ponto do estabelecimento** permite buscar o endereço, mover o marcador e salvar a origem usada no cálculo das entregas.
 
 ### Acesso ao painel
 
@@ -52,7 +52,7 @@ Crie um projeto no [Geoapify MyProjects](https://myprojects.geoapify.com/) e use
 
 O checkout usa Leaflet, mapa `dark-matter-brown`, sugestões limitadas ao Brasil, preenchimento automático ao escolher um endereço e geocodificação reversa ao clicar, arrastar o marcador ou usar a localização do aparelho. O CEP não faz parte do formulário.
 
-Informe também `STORE_LATITUDE` e `STORE_LONGITUDE`, que são a origem das rotas. A taxa é calculada assim:
+O ponto inicial cadastrado é **Rua São Jorge, 20 — Barro Duro, Maceió-AL**. As variáveis `STORE_LATITUDE` e `STORE_LONGITUDE` funcionam como reserva enquanto o banco não está disponível; depois da migração, o endereço pode ser ajustado diretamente em `/admin`. A taxa é calculada assim:
 
 ```text
 taxa base + (quilômetros além da franquia × preço por quilômetro)

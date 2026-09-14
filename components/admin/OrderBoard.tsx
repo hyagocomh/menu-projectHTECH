@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { SerializedOrder } from "@/lib/orders";
 import { formatMoneyFromCents } from "@/lib/money";
+import type { StoreLocation } from "@/lib/store-settings";
+import { StoreSettingsPanel } from "./StoreSettingsPanel";
 
 type OrderStatus = SerializedOrder["status"];
 
@@ -28,7 +30,23 @@ function relativeDate(isoDate: string) {
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(date);
 }
 
-export function OrderBoard({ initialOrders, initialError }: { initialOrders: SerializedOrder[]; initialError?: string }) {
+type OrderBoardProps = {
+  initialOrders: SerializedOrder[];
+  initialError?: string;
+  initialStoreLocation: StoreLocation;
+  storeSettingsWritable: boolean;
+  geoapifyConfigured: boolean;
+  geoapifyMapKey: string;
+};
+
+export function OrderBoard({
+  initialOrders,
+  initialError,
+  initialStoreLocation,
+  storeSettingsWritable,
+  geoapifyConfigured,
+  geoapifyMapKey,
+}: OrderBoardProps) {
   const [orders, setOrders] = useState(initialOrders);
   const [filter, setFilter] = useState<OrderStatus | "ALL">("ALL");
   const [loading, setLoading] = useState(false);
@@ -100,6 +118,13 @@ export function OrderBoard({ initialOrders, initialError }: { initialOrders: Ser
 
       <div className="admin-shell admin-content">
         <div className="admin-title-row"><div><span className="admin-eyebrow">Operação em tempo real</span><h1>Fila de pedidos</h1></div><span className="order-count">{orders.length} pedidos recentes</span></div>
+
+        <StoreSettingsPanel
+          initialLocation={initialStoreLocation}
+          writable={storeSettingsWritable}
+          geoapifyConfigured={geoapifyConfigured}
+          geoapifyMapKey={geoapifyMapKey}
+        />
 
         <section className="admin-stats">
           {[

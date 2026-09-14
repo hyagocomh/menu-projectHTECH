@@ -128,7 +128,8 @@ function normalizeResult(result: GeoapifyResult): GeoapifyAddress | null {
   };
 }
 
-function storeBias() {
+function storeBias(coordinates?: { latitude: number; longitude: number }) {
+  if (coordinates) return `proximity:${coordinates.longitude},${coordinates.latitude}`;
   const latitude = Number(process.env.STORE_LATITUDE);
   const longitude = Number(process.env.STORE_LONGITUDE);
   return Number.isFinite(latitude) && Number.isFinite(longitude)
@@ -180,14 +181,18 @@ async function geoapifyRequest(path: string, params: Record<string, string>) {
   }
 }
 
-export async function searchGeoapifyAddress(query: string, autocomplete: boolean) {
+export async function searchGeoapifyAddress(
+  query: string,
+  autocomplete: boolean,
+  biasCoordinates?: { latitude: number; longitude: number },
+) {
   const response = await geoapifyRequest(
     autocomplete ? "/v1/geocode/autocomplete" : "/v1/geocode/search",
     {
       text: query,
       format: "json",
       filter: "countrycode:br",
-      bias: storeBias(),
+      bias: storeBias(biasCoordinates),
       lang: "pt",
       limit: autocomplete ? "6" : "1",
     },

@@ -7,6 +7,16 @@ const coordinatesSchema = z.object({
 
 export const deliveryQuoteRequestSchema = coordinatesSchema;
 
+export const storeLocationSchema = z.object({
+  street: z.string().trim().min(2).max(160),
+  number: z.string().trim().min(1).max(20),
+  district: z.string().trim().min(2).max(100),
+  city: z.string().trim().min(2).max(100),
+  state: z.string().trim().length(2).toUpperCase(),
+  formattedAddress: z.string().trim().min(5).max(300),
+  ...coordinatesSchema.shape,
+});
+
 export const orderRequestSchema = z.object({
   customer: z.object({
     name: z.string().trim().min(2).max(100),

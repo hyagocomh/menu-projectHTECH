@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getStoreLocation } from "@/lib/store-settings";
+
 export type Coordinates = {
   latitude: number;
   longitude: number;
@@ -38,10 +40,9 @@ export async function calculateDeliveryQuote(
   destination: Coordinates,
 ): Promise<DeliveryQuote> {
   const apiKey = process.env.GEOAPIFY_API_KEY;
-  const storeLatitude = numberFromEnv("STORE_LATITUDE");
-  const storeLongitude = numberFromEnv("STORE_LONGITUDE");
+  const store = await getStoreLocation();
 
-  if (!apiKey || storeLatitude === undefined || storeLongitude === undefined) {
+  if (!apiKey) {
     throw new DeliveryError(
       "O cálculo de entrega ainda não foi configurado pela loja.",
       "DELIVERY_NOT_CONFIGURED",
@@ -56,7 +57,7 @@ export async function calculateDeliveryQuote(
   const url = new URL("https://api.geoapify.com/v1/routing");
   url.searchParams.set(
     "waypoints",
-    `${storeLatitude},${storeLongitude}|${destination.latitude},${destination.longitude}`,
+    `${store.latitude},${store.longitude}|${destination.latitude},${destination.longitude}`,
   );
   url.searchParams.set("mode", mode);
   url.searchParams.set("type", "balanced");

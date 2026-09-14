@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GeoapifyError, searchGeoapifyAddress } from "@/lib/geoapify";
+import { getStoreLocation } from "@/lib/store-settings";
 
 function noStore(response: NextResponse) {
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
@@ -16,7 +17,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const locations = await searchGeoapifyAddress(query, autocomplete);
+    const store = await getStoreLocation();
+    const locations = await searchGeoapifyAddress(query, autocomplete, store);
     return noStore(NextResponse.json({ locations }));
   } catch (error) {
     if (error instanceof GeoapifyError) {

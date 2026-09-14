@@ -69,3 +69,16 @@ model OrderItem {
 
   @@index([orderId])
 }
+
+model StoreSettings {
+  id               String   @id @default("main")
+  street           String
+  number           String
+  district         String
+  city             String
+  state            String
+  formattedAddress String
+  latitude         Float
+  longitude        Float
+  updatedAt        DateTime @updatedAt
+}

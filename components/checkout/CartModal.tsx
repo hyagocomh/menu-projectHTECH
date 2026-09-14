@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Product } from "@/lib/catalog";
 import { formatMoneyFromCents } from "@/lib/money";
+import { AddressAutocomplete } from "./AddressAutocomplete";
 import { AddressMap, type CheckoutAddress } from "./AddressMap";
 
 export type CartLine = Product & { quantity: number; notes: string };
@@ -42,8 +43,8 @@ const EMPTY_ADDRESS: CheckoutAddress = {
   street: "",
   number: "",
   district: "",
-  city: "",
-  state: "",
+  city: "Maceió",
+  state: "AL",
   complement: "",
   formattedAddress: "",
   latitude: null,
@@ -61,6 +62,13 @@ function formatPhone(value: string) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
+function numberTypedAfterStreet(query: string, street: string) {
+  if (!street || !query.toLocaleLowerCase("pt-BR").startsWith(street.toLocaleLowerCase("pt-BR"))) {
+    return "";
+  }
+  return query.slice(street.length).trim().replace(/^,\s*/, "").match(/^[0-9]+[A-Za-z-]*/)?.[0] ?? "";
+}
+
 function loadSavedCheckout<T extends "customer" | "address">(key: T) {
   const fallback = key === "customer"
     ? { name: "", phone: "", email: "" }
@@ -71,7 +79,8 @@ function loadSavedCheckout<T extends "customer" | "address">(key: T) {
       customer?: Customer;
       address?: CheckoutAddress;
     } | null;
-    return saved?.[key] ?? fallback;
+    if (!saved?.[key]) return fallback;
+    return { ...fallback, ...saved[key] };
   } catch {
     return fallback;
   }
@@ -399,7 +408,21 @@ export function CartModal({
                 <p className="checkout-section-title"><span>2</span> Endereço</p>
                 <div className="form-grid cols-6">
                   <label className="field span-4">Rua
-                    <input className="form-control" autoComplete="address-line1" value={address.street} onChange={(event) => updateAddress({ street: event.target.value, latitude: null, longitude: null })} />
+                    <AddressAutocomplete
+                      configured={geoapifyConfigured}
+                      value={address.street}
+                      onValueChange={(street) => updateAddress({ street, latitude: null, longitude: null })}
+                      onSelect={(location) => updateAddress({
+                        street: location.street || address.street,
+                        number: location.number || numberTypedAfterStreet(address.street, location.street) || address.number,
+                        district: location.district || address.district,
+                        city: location.city || address.city,
+                        state: location.state || address.state,
+                        formattedAddress: location.formattedAddress,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                      })}
+                    />
                   </label>
                   <label className="field span-2">Número
                     <input className="form-control" autoComplete="address-line2" value={address.number} onChange={(event) => updateAddress({ number: event.target.value, latitude: null, longitude: null })} />
