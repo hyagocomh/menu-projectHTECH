@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { storeLocationSchema } from "@/lib/order-schema";
+import { storeSettingsSchema } from "@/lib/order-schema";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
 function noStore(response: NextResponse) {
@@ -22,15 +22,15 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const location = storeLocationSchema.parse(await request.json());
+    const storeSettings = storeSettingsSchema.parse(await request.json());
     const settings = await prisma.storeSettings.upsert({
       where: { id: "main" },
-      create: { id: "main", ...location },
-      update: location,
+      create: { id: "main", ...storeSettings },
+      update: storeSettings,
     });
 
     return noStore(NextResponse.json({
-      location: {
+      settings: {
         street: settings.street,
         number: settings.number,
         district: settings.district,
@@ -39,11 +39,16 @@ export async function PATCH(request: Request) {
         formattedAddress: settings.formattedAddress,
         latitude: settings.latitude,
         longitude: settings.longitude,
+        deliveryPricingMode: settings.deliveryPricingMode === "PER_KM" ? "PER_KM" : "FIXED",
+        baseDeliveryFeeCents: settings.baseDeliveryFeeCents,
+        includedDistanceKm: settings.includedDistanceKm,
+        additionalFeePerKmCents: settings.additionalFeePerKmCents,
+        maxDeliveryDistanceKm: settings.maxDeliveryDistanceKm,
       },
     }));
   } catch {
     return noStore(NextResponse.json(
-      { error: "Preencha o endereço e marque um ponto válido no mapa." },
+      { error: "Revise o endereço, o ponto no mapa e os valores da entrega." },
       { status: 400 },
     ));
   }

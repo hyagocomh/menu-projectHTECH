@@ -3,13 +3,22 @@
 import { useEffect, useState } from "react";
 import { AddressAutocomplete } from "@/components/checkout/AddressAutocomplete";
 import { AddressMap, type CheckoutAddress } from "@/components/checkout/AddressMap";
-import type { StoreLocation } from "@/lib/store-settings";
+import { formatMoneyFromCents } from "@/lib/money";
+import type { DeliveryPricingMode, StoreSettings } from "@/lib/store-settings";
 
 type StoreSettingsPanelProps = {
-  initialLocation: StoreLocation;
+  initialSettings: StoreSettings;
   writable: boolean;
   geoapifyConfigured: boolean;
   geoapifyMapKey: string;
+};
+
+type DeliveryForm = {
+  mode: DeliveryPricingMode;
+  baseFee: string;
+  includedKm: string;
+  additionalFeePerKm: string;
+  maxDistanceKm: string;
 };
 
 function typedNumber(query: string, street: string) {
@@ -19,25 +28,53 @@ function typedNumber(query: string, street: string) {
   return query.slice(street.length).trim().replace(/^,\s*/, "").match(/^[0-9]+[A-Za-z-]*/)?.[0] ?? "";
 }
 
+function decimalValue(value: string) {
+  return Number(value.trim().replace(",", "."));
+}
+
+function inputDecimal(value: number) {
+  return value.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+}
+
+function deliveryFormFromSettings(settings: StoreSettings): DeliveryForm {
+  return {
+    mode: settings.deliveryPricingMode,
+    baseFee: inputDecimal(settings.baseDeliveryFeeCents / 100),
+    includedKm: inputDecimal(settings.includedDistanceKm),
+    additionalFeePerKm: inputDecimal(settings.additionalFeePerKmCents / 100),
+    maxDistanceKm: inputDecimal(settings.maxDeliveryDistanceKm),
+  };
+}
+
 export function StoreSettingsPanel({
-  initialLocation,
+  initialSettings,
   writable,
   geoapifyConfigured,
   geoapifyMapKey,
 }: StoreSettingsPanelProps) {
   const [address, setAddress] = useState<CheckoutAddress>({
-    ...initialLocation,
+    ...initialSettings,
     complement: "",
   });
+  const [delivery, setDelivery] = useState<DeliveryForm>(() => deliveryFormFromSettings(initialSettings));
   const [geocodeQuery, setGeocodeQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const updateAddress = (next: Partial<CheckoutAddress>) => {
-    setAddress((current) => ({ ...current, ...next }));
+  const clearFeedback = () => {
     setMessage("");
     setError("");
+  };
+
+  const updateAddress = (next: Partial<CheckoutAddress>) => {
+    setAddress((current) => ({ ...current, ...next }));
+    clearFeedback();
+  };
+
+  const updateDelivery = (next: Partial<DeliveryForm>) => {
+    setDelivery((current) => ({ ...current, ...next }));
+    clearFeedback();
   };
 
   useEffect(() => {
@@ -81,6 +118,24 @@ export function StoreSettingsPanel({
       return;
     }
 
+    const baseFee = decimalValue(delivery.baseFee);
+    const includedKm = decimalValue(delivery.includedKm);
+    const additionalFeePerKm = decimalValue(delivery.additionalFeePerKm);
+    const maxDistanceKm = decimalValue(delivery.maxDistanceKm);
+    if (
+      !Number.isFinite(baseFee) || baseFee < 0
+      || !Number.isFinite(includedKm) || includedKm < 0
+      || !Number.isFinite(additionalFeePerKm) || additionalFeePerKm < 0
+      || !Number.isFinite(maxDistanceKm) || maxDistanceKm <= 0
+    ) {
+      setError("Informe valores válidos para a taxa e o raio de entrega.");
+      return;
+    }
+    if (delivery.mode === "PER_KM" && includedKm > maxDistanceKm) {
+      setError("A distância incluída na taxa não pode superar o raio máximo.");
+      return;
+    }
+
     setSaving(true);
     setError("");
     setMessage("");
@@ -104,24 +159,35 @@ export function StoreSettingsPanel({
           formattedAddress,
           latitude: address.latitude,
           longitude: address.longitude,
+          deliveryPricingMode: delivery.mode,
+          baseDeliveryFeeCents: Math.round(baseFee * 100),
+          includedDistanceKm: includedKm,
+          additionalFeePerKmCents: Math.round(additionalFeePerKm * 100),
+          maxDeliveryDistanceKm: maxDistanceKm,
         }),
       });
-      const data = await response.json() as { location?: StoreLocation; error?: string };
-      if (!response.ok || !data.location) throw new Error(data.error || "Não foi possível salvar o ponto.");
-      setAddress({ ...data.location, complement: "" });
-      setMessage("Ponto da loja salvo. As próximas entregas usarão esta origem.");
+      const data = await response.json() as { settings?: StoreSettings; error?: string };
+      if (!response.ok || !data.settings) {
+        throw new Error(data.error || "Não foi possível salvar as configurações.");
+      }
+      setAddress({ ...data.settings, complement: "" });
+      setDelivery(deliveryFormFromSettings(data.settings));
+      setMessage("Configurações salvas. Os próximos cálculos já usarão esta regra.");
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o ponto.");
+      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar as configurações.");
     } finally {
       setSaving(false);
     }
   };
 
+  const baseFeeCents = Math.max(0, Math.round((decimalValue(delivery.baseFee) || 0) * 100));
+  const additionalFeeCents = Math.max(0, Math.round((decimalValue(delivery.additionalFeePerKm) || 0) * 100));
+
   return (
     <details className="store-settings-panel" open>
       <summary>
-        <span><i className="fas fa-store" /> Ponto do estabelecimento</span>
-        <span>{address.street}, {address.number} · {address.district}</span>
+        <span><i className="fas fa-store" /> Loja e entrega</span>
+        <span>{formatMoneyFromCents(baseFeeCents)} · raio de {delivery.maxDistanceKm || "—"} km</span>
       </summary>
       <div className="store-settings-body">
         <div className="store-settings-form">
@@ -166,18 +232,55 @@ export function StoreSettingsPanel({
             <span>Latitude <b>{address.latitude?.toFixed(7) ?? "A localizar"}</b></span>
             <span>Longitude <b>{address.longitude?.toFixed(7) ?? "A localizar"}</b></span>
           </div>
-          {!writable && <p className="store-settings-warning"><i className="fas fa-database" /> O ponto acima já é usado como origem padrão. Conecte o PostgreSQL para poder alterá-lo pelo painel.</p>}
+
+          <section className="delivery-settings-section">
+            <div className="delivery-settings-heading">
+              <div><span className="admin-eyebrow">Área e cobrança</span><h2>Taxa de entrega</h2></div>
+              <i className="fas fa-motorcycle" />
+            </div>
+            <div className="delivery-mode-options" role="radiogroup" aria-label="Forma de cobrança da entrega">
+              <button type="button" role="radio" aria-checked={delivery.mode === "FIXED"} className={delivery.mode === "FIXED" ? "active" : ""} onClick={() => updateDelivery({ mode: "FIXED" })}>
+                <i className="fas fa-tag" /><span><strong>Taxa fixa</strong><small>Mesmo valor dentro do raio</small></span>
+              </button>
+              <button type="button" role="radio" aria-checked={delivery.mode === "PER_KM"} className={delivery.mode === "PER_KM" ? "active" : ""} onClick={() => updateDelivery({ mode: "PER_KM" })}>
+                <i className="fas fa-route" /><span><strong>Base + por km</strong><small>Acréscimo após a franquia</small></span>
+              </button>
+            </div>
+            <div className="form-grid cols-2 delivery-rules-grid">
+              <label className="field">Taxa base (R$)
+                <input className="form-control" inputMode="decimal" value={delivery.baseFee} onChange={(event) => updateDelivery({ baseFee: event.target.value })} />
+              </label>
+              <label className="field">Raio máximo (km)
+                <input className="form-control" inputMode="decimal" value={delivery.maxDistanceKm} onChange={(event) => updateDelivery({ maxDistanceKm: event.target.value })} />
+              </label>
+              {delivery.mode === "PER_KM" && <>
+                <label className="field">Distância incluída (km)
+                  <input className="form-control" inputMode="decimal" value={delivery.includedKm} onChange={(event) => updateDelivery({ includedKm: event.target.value })} />
+                </label>
+                <label className="field">Adicional por km (R$)
+                  <input className="form-control" inputMode="decimal" value={delivery.additionalFeePerKm} onChange={(event) => updateDelivery({ additionalFeePerKm: event.target.value })} />
+                </label>
+              </>}
+            </div>
+            <p className="delivery-rule-preview">
+              <i className="fas fa-info-circle" /> {delivery.mode === "FIXED"
+                ? `${formatMoneyFromCents(baseFeeCents)} para qualquer rota de até ${delivery.maxDistanceKm || "—"} km.`
+                : `${formatMoneyFromCents(baseFeeCents)} até ${delivery.includedKm || "0"} km, mais ${formatMoneyFromCents(additionalFeeCents)} por km adicional iniciado, limitado a ${delivery.maxDistanceKm || "—"} km.`}
+            </p>
+          </section>
+
+          {!writable && <p className="store-settings-warning"><i className="fas fa-database" /> Conecte o PostgreSQL para alterar estas configurações pelo painel.</p>}
           {message && <p className="store-settings-success"><i className="fas fa-check-circle" /> {message}</p>}
           {error && <p className="store-settings-warning"><i className="fas fa-exclamation-triangle" /> {error}</p>}
           <button className="btn btn-yellow" type="button" onClick={() => void save()} disabled={!writable || saving}>
-            {saving ? <><i className="fas fa-spinner fa-spin" /> Salvando...</> : <><i className="fas fa-save" /> Salvar ponto da loja</>}
+            {saving ? <><i className="fas fa-spinner fa-spin" /> Salvando...</> : <><i className="fas fa-save" /> Salvar endereço e entrega</>}
           </button>
         </div>
         <AddressMap
           configured={geoapifyConfigured}
           mapApiKey={geoapifyMapKey}
-          storeLatitude={initialLocation.latitude}
-          storeLongitude={initialLocation.longitude}
+          storeLatitude={initialSettings.latitude}
+          storeLongitude={initialSettings.longitude}
           address={address}
           geocodeQuery={geocodeQuery}
           onAddressChange={updateAddress}

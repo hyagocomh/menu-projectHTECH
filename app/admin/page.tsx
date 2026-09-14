@@ -3,7 +3,7 @@ import { OrderBoard } from "@/components/admin/OrderBoard";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 import { serializeOrder } from "@/lib/orders";
-import { getStoreLocation } from "@/lib/store-settings";
+import { getStoreSettings } from "@/lib/store-settings";
 
 export const metadata = { title: "Painel de pedidos" };
 export const dynamic = "force-dynamic";
@@ -28,11 +28,11 @@ async function loadOrders() {
 export default async function AdminPage() {
   if (!await isAdminAuthenticated()) redirect("/admin/login");
 
-  const storeLocation = await getStoreLocation();
+  const storeSettings = await getStoreSettings();
   const databaseConfigured = isDatabaseConfigured();
   const geoapifyMapKey = process.env.NEXT_PUBLIC_GEOAPIFY_MAP_KEY ?? "";
   const dashboardProps = {
-    initialStoreLocation: storeLocation,
+    initialStoreSettings: storeSettings,
     storeSettingsWritable: databaseConfigured,
     geoapifyConfigured: Boolean(process.env.GEOAPIFY_API_KEY && geoapifyMapKey),
     geoapifyMapKey,

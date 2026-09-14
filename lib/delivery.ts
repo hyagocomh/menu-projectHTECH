@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getStoreLocation } from "@/lib/store-settings";
+import { getStoreSettings } from "@/lib/store-settings";
 
 export type Coordinates = {
   latitude: number;
@@ -29,18 +29,11 @@ export class DeliveryError extends Error {
   }
 }
 
-function numberFromEnv(name: string, fallback?: number) {
-  const raw = process.env[name];
-  if (!raw && fallback !== undefined) return fallback;
-  const value = Number(raw);
-  return Number.isFinite(value) ? value : undefined;
-}
-
 export async function calculateDeliveryQuote(
   destination: Coordinates,
 ): Promise<DeliveryQuote> {
   const apiKey = process.env.GEOAPIFY_API_KEY;
-  const store = await getStoreLocation();
+  const store = await getStoreSettings();
 
   if (!apiKey) {
     throw new DeliveryError(
@@ -113,26 +106,27 @@ export async function calculateDeliveryQuote(
   }
 
   const distanceKm = distanceMeters / 1000;
-  const maxDistanceKm = numberFromEnv("DELIVERY_MAX_KM", 15) ?? 15;
+  const maxDistanceKm = store.maxDeliveryDistanceKm;
 
-  if (distanceKm > maxDistanceKm) {
+  if (distanceMeters > Math.round(maxDistanceKm * 1000)) {
     throw new DeliveryError(
-      `O endereço fica fora da nossa área de entrega de ${maxDistanceKm.toLocaleString("pt-BR")} km.`,
+      `O endereço fica fora da nossa área de entrega de ${maxDistanceKm.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} km.`,
       "OUTSIDE_DELIVERY_AREA",
     );
   }
 
-  const baseFee = numberFromEnv("DELIVERY_BASE_FEE", 7.5) ?? 7.5;
-  const includedKm = numberFromEnv("DELIVERY_INCLUDED_KM", 2) ?? 2;
-  const pricePerKm = numberFromEnv("DELIVERY_PRICE_PER_KM", 2.5) ?? 2.5;
-  const fee = baseFee + Math.max(0, distanceKm - includedKm) * pricePerKm;
+  const additionalKilometers = store.deliveryPricingMode === "PER_KM"
+    ? Math.ceil(Math.max(0, distanceKm - store.includedDistanceKm))
+    : 0;
+  const deliveryFeeCents = store.baseDeliveryFeeCents
+    + additionalKilometers * store.additionalFeePerKmCents;
   const routeTime = Number(route?.time);
   const durationSeconds = Number.isFinite(routeTime) ? Math.round(routeTime) : 0;
 
   return {
     distanceMeters: Math.round(distanceMeters),
     durationSeconds,
-    deliveryFeeCents: Math.round(fee * 100),
+    deliveryFeeCents,
     distanceLabel: `${distanceKm.toLocaleString("pt-BR", {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,

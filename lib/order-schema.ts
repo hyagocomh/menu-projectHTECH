@@ -7,7 +7,7 @@ const coordinatesSchema = z.object({
 
 export const deliveryQuoteRequestSchema = coordinatesSchema;
 
-export const storeLocationSchema = z.object({
+export const storeSettingsSchema = z.object({
   street: z.string().trim().min(2).max(160),
   number: z.string().trim().min(1).max(20),
   district: z.string().trim().min(2).max(100),
@@ -15,6 +15,11 @@ export const storeLocationSchema = z.object({
   state: z.string().trim().length(2).toUpperCase(),
   formattedAddress: z.string().trim().min(5).max(300),
   ...coordinatesSchema.shape,
+  deliveryPricingMode: z.enum(["FIXED", "PER_KM"]),
+  baseDeliveryFeeCents: z.number().int().min(0).max(100_000),
+  includedDistanceKm: z.number().min(0).max(100),
+  additionalFeePerKmCents: z.number().int().min(0).max(100_000),
+  maxDeliveryDistanceKm: z.number().positive().max(100),
 });
 
 export const orderRequestSchema = z.object({

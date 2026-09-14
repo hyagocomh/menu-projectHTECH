@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { SerializedOrder } from "@/lib/orders";
 import { formatMoneyFromCents } from "@/lib/money";
-import type { StoreLocation } from "@/lib/store-settings";
+import type { StoreSettings } from "@/lib/store-settings";
 import { StoreSettingsPanel } from "./StoreSettingsPanel";
 
 type OrderStatus = SerializedOrder["status"];
@@ -33,7 +33,7 @@ function relativeDate(isoDate: string) {
 type OrderBoardProps = {
   initialOrders: SerializedOrder[];
   initialError?: string;
-  initialStoreLocation: StoreLocation;
+  initialStoreSettings: StoreSettings;
   storeSettingsWritable: boolean;
   geoapifyConfigured: boolean;
   geoapifyMapKey: string;
@@ -42,7 +42,7 @@ type OrderBoardProps = {
 export function OrderBoard({
   initialOrders,
   initialError,
-  initialStoreLocation,
+  initialStoreSettings,
   storeSettingsWritable,
   geoapifyConfigured,
   geoapifyMapKey,
@@ -120,7 +120,7 @@ export function OrderBoard({
         <div className="admin-title-row"><div><span className="admin-eyebrow">Operação em tempo real</span><h1>Fila de pedidos</h1></div><span className="order-count">{orders.length} pedidos recentes</span></div>
 
         <StoreSettingsPanel
-          initialLocation={initialStoreLocation}
+          initialSettings={initialStoreSettings}
           writable={storeSettingsWritable}
           geoapifyConfigured={geoapifyConfigured}
           geoapifyMapKey={geoapifyMapKey}

@@ -52,13 +52,14 @@ Crie um projeto no [Geoapify MyProjects](https://myprojects.geoapify.com/) e use
 
 O checkout usa Leaflet, mapa `dark-matter-brown`, sugestões limitadas ao Brasil, preenchimento automático ao escolher um endereço e geocodificação reversa ao clicar, arrastar o marcador ou usar a localização do aparelho. O CEP não faz parte do formulário.
 
-O ponto inicial cadastrado é **Rua São Jorge, 20 — Barro Duro, Maceió-AL**. As variáveis `STORE_LATITUDE` e `STORE_LONGITUDE` funcionam como reserva enquanto o banco não está disponível; depois da migração, o endereço pode ser ajustado diretamente em `/admin`. A taxa é calculada assim:
+O ponto inicial cadastrado é **Rua São Jorge, 20 — Barro Duro, Maceió-AL**. O painel `/admin` permite alterar o endereço, escolher entre taxa fixa ou taxa base com adicional por quilômetro e definir o raio máximo de entrega. A configuração inicial cobra **R$ 5,00 fixos** e aceita somente rotas de até **5 km**.
 
 ```text
-taxa base + (quilômetros além da franquia × preço por quilômetro)
+Taxa fixa: um único valor para toda a área atendida
+Por km: taxa base + (cada quilômetro iniciado após a distância incluída × adicional)
 ```
 
-Os valores são controlados por `DELIVERY_BASE_FEE`, `DELIVERY_INCLUDED_KM`, `DELIVERY_PRICE_PER_KM` e `DELIVERY_MAX_KM`.
+As variáveis `STORE_LATITUDE`, `STORE_LONGITUDE`, `DELIVERY_PRICING_MODE`, `DELIVERY_BASE_FEE`, `DELIVERY_INCLUDED_KM`, `DELIVERY_PRICE_PER_KM` e `DELIVERY_MAX_KM` funcionam como reserva quando o banco estiver indisponível. Com o PostgreSQL ativo, a configuração salva no painel é a fonte oficial.
 O modo padrão é `scooter`; altere `DELIVERY_ROUTING_MODE` para `drive` ou `motorcycle` se necessário.
 
 Depois de alterar variáveis na Vercel, faça um novo deploy. O push para `main` dispara o deploy automático quando o repositório está conectado ao projeto.
