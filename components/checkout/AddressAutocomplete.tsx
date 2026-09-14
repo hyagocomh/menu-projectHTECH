@@ -16,6 +16,7 @@ export type AddressSuggestion = {
 type AddressAutocompleteProps = {
   configured: boolean;
   value: string;
+  context?: string;
   onValueChange: (value: string) => void;
   onSelect: (location: AddressSuggestion) => void;
   placeholder?: string;
@@ -24,6 +25,7 @@ type AddressAutocompleteProps = {
 export function AddressAutocomplete({
   configured,
   value,
+  context = "",
   onValueChange,
   onSelect,
   placeholder = "Digite a rua e o número",
@@ -47,7 +49,8 @@ export function AddressAutocomplete({
       setSearching(true);
       setError("");
       try {
-        const response = await fetch(`/api/location/search?q=${encodeURIComponent(query)}`, {
+        const searchText = [query, context.trim()].filter(Boolean).join(", ");
+        const response = await fetch(`/api/location/search?q=${encodeURIComponent(searchText)}`, {
           signal: controller.signal,
           cache: "no-store",
         });
@@ -71,7 +74,7 @@ export function AddressAutocomplete({
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [configured, value]);
+  }, [configured, context, value]);
 
   const choose = (location: AddressSuggestion) => {
     setSuggestions([]);

@@ -198,9 +198,19 @@ export async function searchGeoapifyAddress(
     },
   );
 
-  return (response.results ?? []).flatMap((result) => {
+  const locations = (response.results ?? []).flatMap((result) => {
     const normalized = normalizeResult(result);
     return normalized ? [normalized] : [];
+  });
+
+  if (!biasCoordinates) return locations;
+
+  return locations.sort((left, right) => {
+    const leftDistance = (left.latitude - biasCoordinates.latitude) ** 2
+      + (left.longitude - biasCoordinates.longitude) ** 2;
+    const rightDistance = (right.latitude - biasCoordinates.latitude) ** 2
+      + (right.longitude - biasCoordinates.longitude) ** 2;
+    return leftDistance - rightDistance;
   });
 }
 

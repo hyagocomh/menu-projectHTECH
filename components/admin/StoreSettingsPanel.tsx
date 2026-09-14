@@ -135,6 +135,7 @@ export function StoreSettingsPanel({
               <AddressAutocomplete
                 configured={geoapifyConfigured}
                 value={address.street}
+                context={[address.district, address.city, address.state].filter(Boolean).join(", ")}
                 onValueChange={(street) => updateAddress({ street, latitude: null, longitude: null })}
                 onSelect={(location) => updateAddress({
                   street: location.street || address.street,
