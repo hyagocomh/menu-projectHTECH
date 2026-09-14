@@ -1,6 +1,6 @@
 # Makna's Burguer
 
-Cardápio e checkout da Makna's em Next.js, com carrinho, endereço no Google Maps, frete calculado pela rota real, pedidos persistidos em PostgreSQL e painel administrativo.
+Cardápio e checkout da Makna's em Next.js, com carrinho, endereço no Geoapify, frete calculado pela rota real, pedidos persistidos em PostgreSQL e painel administrativo.
 
 ## Rodando localmente
 
@@ -43,12 +43,14 @@ npm run admin:hash -- "uma-senha-forte"
 
 Cadastre o resultado em `ADMIN_PASSWORD_HASH` e o usuário desejado em `ADMIN_USERNAME`. Nunca cadastre a senha em texto puro. A sessão expira após quatro horas e o login bloqueia tentativas repetidas.
 
-### Google Maps e cálculo de entrega
+### Geoapify e cálculo de entrega
 
-No Google Cloud, habilite o faturamento e as APIs **Maps JavaScript API**, **Places API (New)** e **Routes API**. Use duas chaves diferentes:
+Crie um projeto no [Geoapify MyProjects](https://myprojects.geoapify.com/) e use duas chaves com restrições diferentes:
 
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`: chave do navegador, restrita aos domínios da loja e às APIs Maps JavaScript/Places.
-- `GOOGLE_MAPS_SERVER_API_KEY`: chave privada, restrita à Routes API; nunca use o prefixo `NEXT_PUBLIC_` nela.
+- `NEXT_PUBLIC_GEOAPIFY_MAP_KEY`: usada apenas pelos **Map Tiles** no navegador. Restrinja por origem e HTTP referrer aos domínios da loja.
+- `GEOAPIFY_API_KEY`: segredo usado no servidor por **Address Autocomplete**, **Geocoding** e **Routing API**. Nunca use o prefixo `NEXT_PUBLIC_` nela.
+
+O checkout usa Leaflet, mapa `dark-matter-brown`, sugestões limitadas ao Brasil, preenchimento automático ao escolher um endereço e geocodificação reversa ao clicar, arrastar o marcador ou usar a localização do aparelho. O CEP não faz parte do formulário.
 
 Informe também `STORE_LATITUDE` e `STORE_LONGITUDE`, que são a origem das rotas. A taxa é calculada assim:
 
@@ -57,6 +59,7 @@ taxa base + (quilômetros além da franquia × preço por quilômetro)
 ```
 
 Os valores são controlados por `DELIVERY_BASE_FEE`, `DELIVERY_INCLUDED_KM`, `DELIVERY_PRICE_PER_KM` e `DELIVERY_MAX_KM`.
+O modo padrão é `scooter`; altere `DELIVERY_ROUTING_MODE` para `drive` ou `motorcycle` se necessário.
 
 Depois de alterar variáveis na Vercel, faça um novo deploy. O push para `main` dispara o deploy automático quando o repositório está conectado ao projeto.
 

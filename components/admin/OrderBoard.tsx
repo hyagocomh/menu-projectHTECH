@@ -140,7 +140,7 @@ export function OrderBoard({ initialOrders, initialError }: { initialOrders: Ser
                 <div className="order-address">
                   <span className="order-label">Entrega</span>
                   <p>{order.street}, {order.number}<br />{order.district} · {order.city}-{order.state}</p>
-                  <a href={`https://www.google.com/maps/search/?api=1&query=${order.latitude},${order.longitude}`} target="_blank" rel="noreferrer"><i className="fas fa-map-marker-alt" /> {Math.round(order.distanceMeters / 100) / 10} km · {Math.ceil(order.durationSeconds / 60)} min</a>
+                  <a href={`https://www.openstreetmap.org/?mlat=${order.latitude}&mlon=${order.longitude}#map=18/${order.latitude}/${order.longitude}`} target="_blank" rel="noreferrer"><i className="fas fa-map-marker-alt" /> {Math.round(order.distanceMeters / 100) / 10} km · {Math.ceil(order.durationSeconds / 60)} min</a>
                 </div>
                 <div className="order-payment">
                   <span className="order-label">Pagamento</span>

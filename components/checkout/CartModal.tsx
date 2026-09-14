@@ -25,8 +25,10 @@ type Customer = {
 type CartModalProps = {
   open: boolean;
   items: CartLine[];
-  mapsApiKey: string;
-  mapsMapId: string;
+  geoapifyConfigured: boolean;
+  geoapifyMapKey: string;
+  storeLatitude: number;
+  storeLongitude: number;
   whatsappNumber: string;
   onClose: () => void;
   onChangeQuantity: (productId: string, quantity: number) => void;
@@ -78,8 +80,10 @@ function loadSavedCheckout<T extends "customer" | "address">(key: T) {
 export function CartModal({
   open,
   items,
-  mapsApiKey,
-  mapsMapId,
+  geoapifyConfigured,
+  geoapifyMapKey,
+  storeLatitude,
+  storeLongitude,
   whatsappNumber,
   onClose,
   onChangeQuantity,
@@ -167,7 +171,9 @@ export function CartModal({
 
   useEffect(() => {
     if (
-      !mapsApiKey ||
+      !geoapifyConfigured ||
+      address.latitude !== null ||
+      address.longitude !== null ||
       !address.street.trim() ||
       !address.number.trim() ||
       !address.city.trim() ||
@@ -189,10 +195,12 @@ export function CartModal({
   }, [
     address.city,
     address.district,
+    address.latitude,
+    address.longitude,
     address.number,
     address.state,
     address.street,
-    mapsApiKey,
+    geoapifyConfigured,
   ]);
 
   if (!open) return null;
@@ -434,8 +442,10 @@ export function CartModal({
 
               <div className="map-column">
                 <AddressMap
-                  apiKey={mapsApiKey}
-                  mapId={mapsMapId}
+                  configured={geoapifyConfigured}
+                  mapApiKey={geoapifyMapKey}
+                  storeLatitude={storeLatitude}
+                  storeLongitude={storeLongitude}
                   address={address}
                   geocodeQuery={geocodeQuery}
                   onAddressChange={updateAddress}

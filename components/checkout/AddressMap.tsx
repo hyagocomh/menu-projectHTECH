@@ -1,15 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import {
-  AdvancedMarker,
-  APIProvider,
-  Map,
-  MapControl,
-  ControlPosition,
-  useMap,
-  useMapsLibrary,
-} from "@vis.gl/react-google-maps";
+import type { Map as LeafletMap, Marker as LeafletMarker } from "leaflet";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type CheckoutAddress = {
   street: string;
@@ -23,197 +15,313 @@ export type CheckoutAddress = {
   longitude: number | null;
 };
 
-type Position = { lat: number; lng: number };
+type LocationResult = Omit<CheckoutAddress, "complement"> & {
+  latitude: number;
+  longitude: number;
+};
 
 type AddressMapProps = {
-  apiKey: string;
-  mapId: string;
+  configured: boolean;
+  mapApiKey: string;
+  storeLatitude: number;
+  storeLongitude: number;
   address: CheckoutAddress;
   geocodeQuery: string;
   onAddressChange: (next: Partial<CheckoutAddress>) => void;
 };
 
-function componentText(
-  components: google.maps.places.AddressComponent[] | undefined,
-  types: string[],
-  short = false,
-) {
-  const component = components?.find((item) =>
-    types.some((type) => item.types.includes(type)),
-  );
-  return short ? component?.shortText ?? "" : component?.longText ?? "";
+function locationUpdate(location: LocationResult): Partial<CheckoutAddress> {
+  return {
+    street: location.street,
+    number: location.number,
+    district: location.district,
+    city: location.city,
+    state: location.state,
+    formattedAddress: location.formattedAddress,
+    latitude: location.latitude,
+    longitude: location.longitude,
+  };
 }
 
-function PlaceSearch({
-  onSelect,
-}: {
-  onSelect: (place: google.maps.places.Place) => void;
-}) {
-  const map = useMap();
-  const places = useMapsLibrary("places");
-  const containerRef = useRef<HTMLDivElement>(null);
-  const onSelectRef = useRef(onSelect);
-
-  useEffect(() => {
-    onSelectRef.current = onSelect;
-  }, [onSelect]);
-
-  useEffect(() => {
-    if (!map || !places || !containerRef.current) return;
-
-    const autocomplete = new places.PlaceAutocompleteElement();
-    autocomplete.placeholder = "Busque sua rua ou endereço";
-    autocomplete.includedRegionCodes = ["br"];
-    containerRef.current.appendChild(autocomplete);
-
-    const listener = (event: Event) => {
-      const selection = event as google.maps.places.PlacePredictionSelectEvent;
-      const place = selection.placePrediction.toPlace();
-      void place.fetchFields({
-        fields: [
-          "location",
-          "viewport",
-          "formattedAddress",
-          "addressComponents",
-        ],
-      }).then(() => {
-        if (place.viewport) map.fitBounds(place.viewport);
-        else if (place.location) {
-          map.setCenter(place.location);
-          map.setZoom(17);
-        }
-        onSelectRef.current(place);
-      });
-    };
-
-    autocomplete.addEventListener("gmp-select", listener);
-    return () => {
-      autocomplete.removeEventListener("gmp-select", listener);
-      autocomplete.remove();
-    };
-  }, [map, places]);
-
-  return <div className="map-search" ref={containerRef} />;
-}
-
-function MapContent({
+export function AddressMap({
+  configured,
+  mapApiKey,
+  storeLatitude,
+  storeLongitude,
   address,
   geocodeQuery,
   onAddressChange,
-}: Omit<AddressMapProps, "apiKey" | "mapId">) {
-  const map = useMap();
-  const geocoding = useMapsLibrary("geocoding");
-  const lastQuery = useRef("");
-  const position: Position | null = address.latitude !== null && address.longitude !== null
-    ? { lat: address.latitude, lng: address.longitude }
-    : null;
+}: AddressMapProps) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const markerRef = useRef<LeafletMarker | null>(null);
+  const leafletRef = useRef<typeof import("leaflet") | null>(null);
+  const lastGeocodeQuery = useRef("");
+  const searchValueRef = useRef("");
+  const skipNextAutocomplete = useRef(false);
+  const [mapReady, setMapReady] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
+  const [suggestions, setSuggestions] = useState<LocationResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const [locating, setLocating] = useState(false);
+
+  const resolveCoordinates = useCallback(async (latitude: number, longitude: number) => {
+    onAddressChange({ latitude, longitude });
+    setSearchError("");
+
+    try {
+      const params = new URLSearchParams({
+        latitude: String(latitude),
+        longitude: String(longitude),
+      });
+      const response = await fetch(`/api/location/reverse?${params}`, {
+        cache: "no-store",
+      });
+      const data = await response.json() as { location?: LocationResult; error?: string };
+      if (!response.ok || !data.location) {
+        throw new Error(data.error || "Não foi possível identificar esse ponto.");
+      }
+      onAddressChange(locationUpdate(data.location));
+      if (data.location.formattedAddress !== searchValueRef.current) {
+        skipNextAutocomplete.current = true;
+        searchValueRef.current = data.location.formattedAddress;
+        setSearchValue(data.location.formattedAddress);
+      }
+    } catch (error) {
+      setSearchError(error instanceof Error ? error.message : "Não foi possível identificar esse ponto.");
+    }
+  }, [onAddressChange]);
 
   useEffect(() => {
-    if (
-      !map ||
-      !geocoding ||
-      !geocodeQuery ||
-      (lastQuery.current === geocodeQuery && address.latitude !== null && address.longitude !== null)
-    ) return;
-    lastQuery.current = geocodeQuery;
-    const geocoder = new geocoding.Geocoder();
-    void geocoder.geocode({ address: geocodeQuery, region: "BR" }).then(({ results }) => {
-      const result = results[0];
-      if (!result) return;
-      const location = result.geometry.location;
-      const next = { latitude: location.lat(), longitude: location.lng() };
-      map.setCenter(location);
-      map.setZoom(17);
-      onAddressChange(next);
-    }).catch(() => undefined);
-  }, [
-    address.latitude,
-    address.longitude,
-    geocodeQuery,
-    geocoding,
-    map,
-    onAddressChange,
-  ]);
+    if (!configured || !mapContainerRef.current) return;
 
-  const handlePlace = (place: google.maps.places.Place) => {
-    if (!place.location) return;
-    const components = place.addressComponents;
-    const route = componentText(components, ["route"]);
-    const number = componentText(components, ["street_number"]);
-    const district = componentText(components, [
-      "sublocality_level_1",
-      "sublocality_level_2",
-      "neighborhood",
-    ]);
+    let disposed = false;
+    let localMap: LeafletMap | null = null;
 
-    onAddressChange({
-      street: route || address.street,
-      number: number || address.number,
-      district: district || address.district,
-      city: componentText(components, ["administrative_area_level_2", "locality"]) || address.city,
-      state: componentText(components, ["administrative_area_level_1"], true) || address.state,
-      formattedAddress: place.formattedAddress ?? address.formattedAddress,
-      latitude: place.location.lat(),
-      longitude: place.location.lng(),
+    void import("leaflet").then((leaflet) => {
+      if (disposed || !mapContainerRef.current) return;
+      leafletRef.current = leaflet;
+
+      localMap = leaflet.map(mapContainerRef.current, {
+        zoomControl: false,
+        attributionControl: true,
+      }).setView([storeLatitude, storeLongitude], 13);
+      leaflet.control.zoom({ position: "bottomleft" }).addTo(localMap);
+
+      const retinaSuffix = leaflet.Browser.retina ? "@2x" : "";
+      leaflet.tileLayer(
+        `https://maps.geoapify.com/v1/tile/dark-matter-brown/{z}/{x}/{y}${retinaSuffix}.png?apiKey=${encodeURIComponent(mapApiKey)}`,
+        {
+          maxZoom: 20,
+          attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap</a>',
+        },
+      ).addTo(localMap);
+
+      localMap.on("click", (event) => {
+        void resolveCoordinates(event.latlng.lat, event.latlng.lng);
+      });
+
+      mapRef.current = localMap;
+      setMapReady((value) => value + 1);
     });
+
+    return () => {
+      disposed = true;
+      markerRef.current = null;
+      leafletRef.current = null;
+      mapRef.current = null;
+      localMap?.remove();
+    };
+  }, [configured, mapApiKey, resolveCoordinates, storeLatitude, storeLongitude]);
+
+  useEffect(() => {
+    const leaflet = leafletRef.current;
+    const map = mapRef.current;
+    if (!leaflet || !map || address.latitude === null || address.longitude === null) return;
+
+    const position: [number, number] = [address.latitude, address.longitude];
+    if (!markerRef.current) {
+      const icon = leaflet.divIcon({
+        className: "maknas-map-marker-wrapper",
+        html: '<span class="maknas-map-marker"><i class="fas fa-map-marker-alt"></i></span>',
+        iconSize: [42, 48],
+        iconAnchor: [21, 45],
+      });
+      const marker = leaflet.marker(position, { draggable: true, icon }).addTo(map);
+      marker.on("dragend", () => {
+        const point = marker.getLatLng();
+        void resolveCoordinates(point.lat, point.lng);
+      });
+      markerRef.current = marker;
+    } else {
+      markerRef.current.setLatLng(position);
+    }
+    map.setView(position, 17, { animate: true });
+  }, [address.latitude, address.longitude, mapReady, resolveCoordinates]);
+
+  useEffect(() => {
+    if (!configured || !geocodeQuery || lastGeocodeQuery.current === geocodeQuery) return;
+    lastGeocodeQuery.current = geocodeQuery;
+    const controller = new AbortController();
+
+    void fetch(`/api/location/search?mode=geocode&q=${encodeURIComponent(geocodeQuery)}`, {
+      signal: controller.signal,
+      cache: "no-store",
+    }).then(async (response) => {
+      const data = await response.json() as { locations?: LocationResult[]; error?: string };
+      if (!response.ok) throw new Error(data.error || "Endereço não encontrado.");
+      const location = data.locations?.[0];
+      if (!location) throw new Error("Não encontramos esse endereço.");
+      onAddressChange({
+        formattedAddress: location.formattedAddress,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) return;
+      setSearchError(error instanceof Error ? error.message : "Endereço não encontrado.");
+    });
+
+    return () => controller.abort();
+  }, [configured, geocodeQuery, onAddressChange]);
+
+  useEffect(() => {
+    const query = searchValue.normalize("NFKC").trim();
+    if (skipNextAutocomplete.current) {
+      skipNextAutocomplete.current = false;
+      return;
+    }
+    if (!configured || query.length < 3) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      setSearching(true);
+      setSearchError("");
+      try {
+        const response = await fetch(`/api/location/search?q=${encodeURIComponent(query)}`, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        const data = await response.json() as { locations?: LocationResult[]; error?: string };
+        if (!response.ok) throw new Error(data.error || "Não foi possível buscar o endereço.");
+        setSuggestions(data.locations ?? []);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setSuggestions([]);
+        setSearchError(error instanceof Error ? error.message : "Não foi possível buscar o endereço.");
+      } finally {
+        if (!controller.signal.aborted) setSearching(false);
+      }
+    }, 320);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [configured, searchValue]);
+
+  const selectLocation = (location: LocationResult) => {
+    setSuggestions([]);
+    setSearchError("");
+    if (location.formattedAddress !== searchValueRef.current) {
+      skipNextAutocomplete.current = true;
+      searchValueRef.current = location.formattedAddress;
+      setSearchValue(location.formattedAddress);
+    }
+    onAddressChange(locationUpdate(location));
   };
 
-  return (
-    <>
-      <MapControl position={ControlPosition.BLOCK_START_INLINE_START}>
-        <PlaceSearch onSelect={handlePlace} />
-      </MapControl>
-      {position && (
-        <AdvancedMarker
-          position={position}
-          draggable
-          onDragEnd={(event) => {
-            const latLng = event.latLng;
-            if (!latLng) return;
-            onAddressChange({ latitude: latLng.lat(), longitude: latLng.lng() });
-          }}
-          title="Local da entrega"
-        />
-      )}
-    </>
-  );
-}
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setSearchError("Seu navegador não oferece localização por GPS.");
+      return;
+    }
 
-export function AddressMap(props: AddressMapProps) {
-  if (!props.apiKey) {
+    setLocating(true);
+    setSearchError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocating(false);
+        void resolveCoordinates(position.coords.latitude, position.coords.longitude);
+      },
+      () => {
+        setLocating(false);
+        setSearchError("Não foi possível acessar sua localização. Verifique a permissão do navegador.");
+      },
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
+    );
+  };
+
+  if (!configured) {
     return (
       <div className="map-not-configured">
         <i className="fas fa-map-marked-alt" />
         <div>
-          <strong>Mapa aguardando configuração</strong>
-          <span>Cadastre a chave do Google Maps na Vercel para ativar busca e cálculo automático.</span>
+          <strong>Geoapify aguardando configuração</strong>
+          <span>Cadastre as chaves do Geoapify na Vercel para ativar busca, mapa e cálculo automático.</span>
         </div>
       </div>
     );
   }
 
-  const center = props.address.latitude !== null && props.address.longitude !== null
-    ? { lat: props.address.latitude, lng: props.address.longitude }
-    : { lat: -9.6658, lng: -35.7353 };
-
   return (
     <div className="address-map">
-      <APIProvider apiKey={props.apiKey} libraries={["places", "geocoding"]}>
-        <Map
-          defaultCenter={center}
-          defaultZoom={13}
-          mapId={props.mapId || "DEMO_MAP_ID"}
-          gestureHandling="greedy"
-          disableDefaultUI
-          zoomControl
-        >
-          <MapContent
-            address={props.address}
-            geocodeQuery={props.geocodeQuery}
-            onAddressChange={props.onAddressChange}
+      <div className="map-search-panel">
+        <div className="map-search-row">
+          <i className={`fas ${searching ? "fa-spinner fa-spin" : "fa-search"}`} />
+          <input
+            type="search"
+            role="combobox"
+            aria-label="Buscar endereço"
+            aria-expanded={suggestions.length > 0}
+            aria-controls="address-suggestions"
+            autoComplete="off"
+            placeholder="Busque sua rua ou endereço"
+            value={searchValue}
+            onChange={(event) => {
+              const value = event.target.value;
+              searchValueRef.current = value;
+              setSearchValue(value);
+              if (value.trim().length < 3) {
+                setSuggestions([]);
+                setSearching(false);
+                setSearchError("");
+              }
+            }}
           />
-        </Map>
-      </APIProvider>
+          <button
+            type="button"
+            onClick={useCurrentLocation}
+            disabled={locating}
+            aria-label="Usar minha localização atual"
+            title="Usar minha localização atual"
+          >
+            <i className={`fas ${locating ? "fa-spinner fa-spin" : "fa-crosshairs"}`} />
+          </button>
+        </div>
+        {suggestions.length > 0 && (
+          <div className="map-search-suggestions" id="address-suggestions" role="listbox">
+            {suggestions.map((location, index) => (
+              <button
+                type="button"
+                role="option"
+                aria-selected="false"
+                key={`${location.latitude}-${location.longitude}-${index}`}
+                onClick={() => selectLocation(location)}
+              >
+                <i className="fas fa-map-marker-alt" />
+                <span>{location.formattedAddress}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {searchError && <p className="map-search-error" role="status">{searchError}</p>}
+      </div>
+      <div className="leaflet-map-canvas" ref={mapContainerRef} aria-label="Mapa do endereço de entrega" />
+      <span className="map-drag-hint"><i className="fas fa-hand-pointer" /> Clique ou arraste o marcador para ajustar</span>
     </div>
   );
 }

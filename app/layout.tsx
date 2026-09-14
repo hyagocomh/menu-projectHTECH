@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import "leaflet/dist/leaflet.css";
 import "@/css/bootstrap.min.css";
 import "@/css/fontawesome.css";
 import "@/css/animate.css";

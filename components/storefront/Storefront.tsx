@@ -8,8 +8,10 @@ import { brl } from "@/lib/money";
 import { CartModal, type CartLine } from "@/components/checkout/CartModal";
 
 type StorefrontProps = {
-  mapsApiKey: string;
-  mapsMapId: string;
+  geoapifyConfigured: boolean;
+  geoapifyMapKey: string;
+  storeLatitude: number;
+  storeLongitude: number;
   whatsappNumber: string;
 };
 
@@ -52,7 +54,13 @@ const ITEM_NOTES_KEY = "maknas-observacoes-itens-v1";
 const MAX_QUANTITY = 99;
 const MAX_ITEM_NOTE_LENGTH = 200;
 
-export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: StorefrontProps) {
+export function Storefront({
+  geoapifyConfigured,
+  geoapifyMapKey,
+  storeLatitude,
+  storeLongitude,
+  whatsappNumber,
+}: StorefrontProps) {
   const [activeCategory, setActiveCategory] = useState<CategoryId>("burgers");
   const [showAll, setShowAll] = useState(false);
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -393,8 +401,10 @@ export function Storefront({ mapsApiKey, mapsMapId, whatsappNumber }: Storefront
       {cartOpen && <CartModal
         open={cartOpen}
         items={cartItems}
-        mapsApiKey={mapsApiKey}
-        mapsMapId={mapsMapId}
+        geoapifyConfigured={geoapifyConfigured}
+        geoapifyMapKey={geoapifyMapKey}
+        storeLatitude={storeLatitude}
+        storeLongitude={storeLongitude}
         whatsappNumber={whatsappNumber}
         onClose={() => setCartOpen(false)}
         onChangeQuantity={changeQuantity}

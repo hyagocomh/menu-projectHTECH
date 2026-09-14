@@ -46,7 +46,7 @@ model Order {
   subtotalCents      Int
   deliveryFeeCents   Int
   totalCents         Int
-  deliveryProvider   String        @default("google-routes")
+  deliveryProvider   String        @default("geoapify-routing")
   items              OrderItem[]
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt

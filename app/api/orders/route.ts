@@ -65,6 +65,7 @@ export async function POST(request: Request) {
         subtotalCents,
         deliveryFeeCents: quote.deliveryFeeCents,
         totalCents: subtotalCents + quote.deliveryFeeCents,
+        deliveryProvider: "geoapify-routing",
         items: { create: catalogItems },
       },
       include: { items: true },
