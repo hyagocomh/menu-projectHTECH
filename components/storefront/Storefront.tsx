@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { categories, menu, type CategoryId, type Product } from "@/lib/catalog";
 import { brl } from "@/lib/money";
 import { CartModal, type CartLine } from "@/components/checkout/CartModal";
+import { HeroVideo } from "./HeroVideo";
 
 type StorefrontProps = {
   geoapifyConfigured: boolean;
@@ -307,9 +308,8 @@ export function Storefront({
                 <a href="#" className="btn btn-sm btn-white btn-social mt-4 mr-3" aria-label="Facebook"><i className="fab fa-facebook-f" /></a>
                 <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="btn btn-sm btn-white btn-social mt-4" aria-label="WhatsApp"><i className="fab fa-whatsapp" /></a>
               </div>
-              <div className="col-6 no-mobile hero-visual">
-                <div className="card-banner" />
-                <div className="d-flex img-banner"><Image src="/img/logo-maknas.png" width={550} height={550} priority alt="Emblema Makna's Burguer" /></div>
+              <div className="col-12 col-lg-6 col-md-6 hero-visual">
+                <HeroVideo />
                 <div className="card card-case"><span className="case-stars">★★★★★</span>“Chegou quente, suculento e com sabor de brasa de verdade.”<span className="card-case-name"><b>Thiago Lopes</b></span></div>
               </div>
             </div>
