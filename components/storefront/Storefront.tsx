@@ -287,6 +287,7 @@ export function Storefront({
 
       <main>
         <section className="banner" id="inicio">
+          <div className="hero-scroll-scene">
           <div className="container">
             <div className="row">
               <div className="col-12 col-lg-6 col-md-6 col-sm-12 col-one">
@@ -314,6 +315,8 @@ export function Storefront({
               </div>
             </div>
           </div>
+          </div>
+          <div className="hero-scroll-space" aria-hidden="true" />
         </section>
 
         <section className="servicos" id="servicos">

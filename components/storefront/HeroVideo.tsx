@@ -24,7 +24,9 @@ export function HeroVideo() {
   useEffect(() => {
     const stage = stageRef.current;
     const video = videoRef.current;
-    if (!motionEnabled || videoFailed || !stage || !video) return;
+    const section = stage?.closest<HTMLElement>(".banner");
+    const scene = stage?.closest<HTMLElement>(".hero-scroll-scene");
+    if (!motionEnabled || videoFailed || !video || !section || !scene) return;
 
     let frame = 0;
     let targetTime = 0;
@@ -37,24 +39,18 @@ export function HeroVideo() {
       frame = 0;
       if (!Number.isFinite(video.duration) || video.duration <= 0 || video.seeking) return;
 
-      const difference = targetTime - video.currentTime;
-      if (Math.abs(difference) < 0.025) return;
-
-      video.currentTime = Math.min(
-        Math.max(video.currentTime + difference * 0.28, 0),
-        Math.max(0, video.duration - 0.05),
-      );
-      if (!video.seeking) schedule();
+      if (Math.abs(targetTime - video.currentTime) < 0.025) return;
+      video.currentTime = targetTime;
     };
 
     const updateTarget = () => {
       if (!Number.isFinite(video.duration) || video.duration <= 0) return;
 
-      const bounds = stage.getBoundingClientRect();
-      const stageTop = bounds.top + window.scrollY;
+      const bounds = section.getBoundingClientRect();
+      const sectionTop = bounds.top + window.scrollY;
       const headerHeight = document.querySelector(".header")?.getBoundingClientRect().height ?? 0;
-      const start = Math.max(0, stageTop - headerHeight);
-      const distance = Math.max(bounds.height, window.innerHeight * 0.45);
+      const start = Math.max(0, sectionTop - headerHeight);
+      const distance = Math.max(1, section.offsetHeight - scene.offsetHeight);
       const progress = Math.min(1, Math.max(0, (window.scrollY - start) / distance));
 
       targetTime = progress * Math.max(0, video.duration - 0.05);
@@ -87,7 +83,7 @@ export function HeroVideo() {
             className={`hero-video ${videoReady ? "is-ready" : ""}`}
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             poster={VIDEO_POSTER}
             aria-hidden="true"
             tabIndex={-1}
