@@ -1732,18 +1732,7 @@ footer a:not(.btn) {
 }
 
 .hero-video-fallback {
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at 50% 48%, rgba(242, 13, 19, 0.29), transparent 56%),
-    repeating-linear-gradient(145deg, rgba(255, 250, 240, 0.025) 0 1px, transparent 1px 34px),
-    #121214;
-}
-
-.hero-video-fallback img {
-  width: min(84%, 430px);
-  height: auto;
-  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.6));
+  background: #121214 url("/img/hero-video-poster.jpg") center / cover no-repeat;
 }
 
 .hero-video {

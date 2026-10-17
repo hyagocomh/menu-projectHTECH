@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const VIDEO_SOURCE = "/video/gemini_generated_video_2b51582c.mp4";
+const VIDEO_POSTER = "/img/hero-video-poster.jpg";
 
 export function HeroVideo() {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -14,8 +14,7 @@ export function HeroVideo() {
 
   useEffect(() => {
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const updatePreference = () => setMotionEnabled(!motionPreference.matches && !connection?.saveData);
+    const updatePreference = () => setMotionEnabled(!motionPreference.matches);
 
     updatePreference();
     motionPreference.addEventListener("change", updatePreference);
@@ -81,9 +80,7 @@ export function HeroVideo() {
   return (
     <div className="hero-video-stage" ref={stageRef} role="img" aria-label="Vídeo da Makna's Burguer controlado pela rolagem da página">
       <div className="hero-video-screen">
-        <div className="hero-video-fallback">
-          <Image src="/img/logo-maknas.png" width={550} height={550} priority alt="" />
-        </div>
+        <div className="hero-video-fallback" aria-hidden="true" />
         {motionEnabled && !videoFailed && (
           <video
             ref={videoRef}
@@ -91,8 +88,10 @@ export function HeroVideo() {
             muted
             playsInline
             preload="metadata"
+            poster={VIDEO_POSTER}
             aria-hidden="true"
             tabIndex={-1}
+            onLoadStart={() => setVideoReady(false)}
             onLoadedData={() => setVideoReady(true)}
             onError={() => setVideoFailed(true)}
           >
@@ -102,7 +101,9 @@ export function HeroVideo() {
       </div>
       <span className="hero-video-corner hero-video-corner-top" aria-hidden="true" />
       <span className="hero-video-corner hero-video-corner-bottom" aria-hidden="true" />
-      <span className="hero-video-label">MAKNA&apos;S <b>•</b> FEITO NA BRASA</span>
+      <span className="hero-video-label">
+        {motionEnabled && !videoFailed ? "ROLE PARA VER" : "MAKNA'S"} <b>•</b> FEITO NA BRASA
+      </span>
     </div>
   );
 }
